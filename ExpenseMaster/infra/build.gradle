@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.3.4.RELEASE'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.springframework.boot' version '3.2.3'
+}
+
+group = 'com.expensemaster.infra'
+version = '1.0-SNAPSHOT'
+
+tasks.named("bootJar") {
+    archiveFileName.set("application.jar")
+    destinationDirectory.set(file("${rootProject.buildDir}/libs"))
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":application"))
+    implementation('org.springframework.boot:spring-boot-starter-web:3.2.5')
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.37.0"));
+    implementation('org.springframework.boot:spring-boot-starter-amqp:3.2.5')
+    implementation('io.opentelemetry:opentelemetry-exporter-otlp:1.36.0')
+    implementation("io.opentelemetry:opentelemetry-api");
+    implementation("io.opentelemetry:opentelemetry-sdk");
+    implementation("io.opentelemetry:opentelemetry-exporter-logging");
+    implementation("io.opentelemetry.semconv:opentelemetry-semconv:1.25.0-alpha");
+}
+
+test {
+    useJUnitPlatform()
+}

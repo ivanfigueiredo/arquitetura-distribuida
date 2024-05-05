@@ -1,0 +1,101 @@
+_format_version: "1.1"
+
+
+upstreams:
+  - name: default_upstream
+    slots: 1000
+    algorithm: round-robin
+    healthchecks:
+      active:
+        concurrency: 10
+        healthy:
+          http_statuses: [200, 202, 201, 204]
+          interval: 10
+          successes: 3
+        http_path: /health
+        timeout: 1
+        type: http
+        unhealthy:
+          http_failures: 3
+          http_statuses:
+            - 429
+            - 404
+            - 500
+            - 501
+            - 502
+            - 503
+            - 504
+            - 505
+            - 506
+            - 507
+            - 508
+            - 510
+            - 511
+          tcp_failures: 3
+      passive:
+        healthy:
+          http_statuses: [200, 201, 202, 203, 204, 205, 206, 207, 208, 226, 300, 301, 302, 303, 304, 305, 306, 307, 308]
+          successes: 5
+    targets:
+      - target: bus:8080
+        weight: 100
+
+services:
+  - name: Users
+    host: default_upstream
+    url: http://bus:8080/users/signup
+    routes:
+      - name: Create_User
+        paths:
+          - /users/signup
+        methods:
+          - POST
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 10
+          limit_by: ip
+      - name: opentelemetry
+        config:
+          endpoint: http://opentelemetry-collector:4318/v1/traces
+      - name: cors
+        config:
+          origins: ["*"]
+          methods: ["GET", "POST", "PUT", "DELETE"]
+          headers: ["Origin", "Content-Type"]
+      - name: correlation-id
+        config:
+          header_name: X-Correlation-ID
+  - name: auth
+    host: default_upstream
+    url: http://auth:6000/auth
+    routes:
+      - name: Auth
+        paths:
+          - /autenticate
+        methods:
+          - POST
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 10
+          limit_by: ip
+      - name: cors
+        config:
+          origins: ["*"]
+          methods: ["GET", "POST", "PUT", "DELETE"]
+          headers: ["Origin", "Content-Type"]
+      - name: correlation-id
+        config:
+          header_name: X-Correlation-ID
+
+consumers:
+  - username: loginservice
+
+
+jwt_secrets:
+  - consumer: loginservice
+    key: a2f6f906-a3d6-4a4e-bcaf-25e133151600
+    secret: fb0557e8-a202-495c-9eda-94fa65c33070
+    algorithm: "HS256"
+

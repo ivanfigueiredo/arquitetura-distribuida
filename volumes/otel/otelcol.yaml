@@ -1,0 +1,18 @@
+receivers:
+  otlp:
+    protocols:
+      http: 
+
+exporters:
+  logging:
+    verbosity: Detailed
+  zipkin:
+    endpoint: "http://zipkin:9411/api/v2/spans"
+    tls:
+     insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [zipkin]

@@ -1,0 +1,139 @@
+version: "3.8"
+
+services:
+  kong:
+    image: kong:latest
+    container_name: kong
+    networks:
+      - expense
+    restart: always
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_LOG_LEVEL: debug
+      KONG_TRACING_INSTRUMENTATIONS: all
+      KONG_TRACING_SAMPLING_RATE: 1.0
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+
+    depends_on:
+      - auth
+      - bus
+      - opentelemetry-collector
+
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 120s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - ./volumes/kong/kong.yml:/kong/declarative/kong.yml
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8002:8002"
+      - "8001:8001"
+      - "8444:8444"
+
+  opentelemetry-collector:
+    container_name: opentelemetry-collector
+    restart: always
+    depends_on:
+      - zipkin
+    image: otel/opentelemetry-collector-contrib:0.99.0
+    ports:
+      - "1888:1888"
+      - "8888:8888"
+      - "8889:8889"
+      - "13133:13133"
+      - "4317:4317"
+      - "4318:4318"
+      - "55679:55679"
+    volumes:
+      - ./volumes/otel/otelcol.yaml:/etc/otel-collector-config.yaml
+    command: --config=/etc/otel-collector-config.yaml
+    networks:
+      - expense
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"
+    networks:
+      - expense
+
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    container_name: auth
+    restart: always
+    networks:
+      - expense
+    depends_on:
+      - mongo
+
+  mongo:
+    container_name: wm-mongo
+    image: mongo:4.4.7-focal
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=Test
+      - MONGO_INITDB_ROOT_USERNAME=ROOT
+      - MONGO_INITDB_ROOT_PASSWORD=ROOT
+    networks:
+      - expense
+
+  queue:
+    container_name: rabbitMQ
+    image: rabbitmq:3-management
+    hostname: my-rabbit
+    volumes:
+      - ./volumes/rabbitmq-data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - expense
+
+  create_user:
+    container_name: user_create
+    restart: always
+    build:
+      context: ./create-user
+      dockerfile: Dockerfile
+    networks:
+      - expense
+    depends_on:
+      - queue
+      - mongo
+
+  bus:
+    container_name: bus_app
+    restart: always
+    build:
+      context: ./ExpenseMaster
+      dockerfile: Dockerfile
+    networks:
+      - expense
+    depends_on:
+      - queue
+      - opentelemetry-collector
+
+volumes:
+  rabbitmq-data:
+
+networks:
+  expense:
+    driver: bridge

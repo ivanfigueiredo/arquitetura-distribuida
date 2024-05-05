@@ -1,0 +1,6 @@
+rootProject.name = 'ExpenseMaster'
+include 'infra'
+include 'infra'
+include 'infra'
+include 'application'
+
