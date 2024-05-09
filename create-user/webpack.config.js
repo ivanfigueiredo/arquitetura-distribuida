@@ -1,6 +1,32 @@
 const path = require('path');
+const webpack = require('webpack');
 const fs = require('fs');
 const config = {};
+
+const WebPackIgnorePlugin =
+{
+  checkResource: function(resource)
+  {
+    const lazyImports =
+    [
+        '@opentelemetry/'
+    ];
+  
+    if (!lazyImports.includes(resource))
+      return false;
+
+    try
+    {
+      require.resolve(resource);
+    }
+    catch (err)
+    {
+      return true;
+    }
+  
+    return false;
+  }
+};
 
 module.exports = {
   target: 'node',
@@ -15,6 +41,7 @@ module.exports = {
       },
     ],
   },
+  //plugins:[new webpack.IgnorePlugin(WebPackIgnorePlugin)],
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist'),
