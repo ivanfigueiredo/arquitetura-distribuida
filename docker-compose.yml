@@ -118,6 +118,7 @@ services:
     depends_on:
       - queue
       - mongo
+      - opentelemetry-collector
 
   bus:
     container_name: bus_app
