@@ -1,9 +1,10 @@
 {
-  "name": "auth",
+  "name": "create-user",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start:dev": "npm run build && clear && npm run start",
     "start": "node ./dist/main.js",
     "build": "rm -rf ./dist && npx webpack --config webpack.config.js"
   },
@@ -11,10 +12,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@opentelemetry/api": "^1.8.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "^0.51.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.51.0",
+    "@opentelemetry/resources": "^1.24.0",
+    "@opentelemetry/sdk-node": "^0.51.0",
+    "@opentelemetry/semantic-conventions": "^1.24.0",
+    "amqplib": "^0.10.3",
     "express": "^4.19.2",
     "mongodb": "^6.5.0",
     "rimraf": "^5.0.5",
-    "amqplib": "^0.10.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
