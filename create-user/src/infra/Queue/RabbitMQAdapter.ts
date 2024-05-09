@@ -1,8 +1,11 @@
+import { ISpan } from "../ISpan";
 import Queue from "./Queue";
 import amqp from 'amqplib';
 
 export class RabbitMQAdapter implements Queue {
     private connection: any;
+
+	constructor(private readonly context: ISpan) {}
 
     async connect(): Promise<void> {
         this.connection = await amqp.connect("amqp://rabbitmq:rabbitmq@rabbitMQ:5672");
@@ -11,11 +14,14 @@ export class RabbitMQAdapter implements Queue {
     async consume(queueName: string, callback: Function): Promise<void> {
         const channel = await this.connection.createChannel();
 		await channel.assertQueue(queueName, { durable: true });
-		channel.consume(queueName, async function (msg: any) {
-			console.log('=================>>>>>>>>>>> MSG', msg.properties.headers);
+		channel.consume(queueName, async (msg: any)=> {
+			this.context.setHeaders({
+				correlationId: msg.properties.headers.correlationId,
+				traceparent: msg.properties.headers.traceparent
+			});
 			const input = JSON.parse(msg.content.toString());
 			try {
-				await callback(input);
+				await this.context.startSpan("create.user.event", async () => await callback(input));
 				channel.ack(msg);
 			} catch (e: any) {
 				console.log(e.message);
