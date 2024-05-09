@@ -8,7 +8,7 @@ import java.util.Set;
 public class HeaderGetter implements TextMapGetter<Object> {
     @Override
     public Iterable<String> keys(Object carrier) {
-        return Set.of("traceparent", "correlationId");
+        return Set.of("traceparent");
     }
 
     @Override
