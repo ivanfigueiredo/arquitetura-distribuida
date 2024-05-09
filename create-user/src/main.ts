@@ -1,18 +1,22 @@
 import { UserService } from './application/UserService';
-import { AuthDatabase } from './infra/UserDatabase';
+import { UserDatabase } from './infra/UserDatabase';
 import { ExpressAdapter } from './infra/ExpressAdapter';
 import { MainCoontroller } from './infra/MainController';
 import { MongoDBAdapter } from './infra/MongoDBAdapter';
 import QueueController from './infra/Queue/QueueController';
 import { RabbitMQAdapter } from './infra/Queue/RabbitMQAdapter';
+import { OpenTelemetrySDK } from './infra/OpenTelemetrySDK';
+import { SpanAdapter } from './infra/SpanAdapter';
 
 async function init() {
-    const queue = new RabbitMQAdapter();
+    new OpenTelemetrySDK();
+    const spanAdapter = new SpanAdapter();
+    const queue = new RabbitMQAdapter(spanAdapter);
     await queue.connect();
     const expressAdapter = new ExpressAdapter();
     const database = new MongoDBAdapter();
-    const userDAO = new AuthDatabase(database);
-    const service = new UserService(userDAO);
+    const userDatabase = new UserDatabase(database);
+    const service = new UserService(userDatabase, spanAdapter);
     new MainCoontroller(expressAdapter, service);
     new QueueController(queue, service);
 
