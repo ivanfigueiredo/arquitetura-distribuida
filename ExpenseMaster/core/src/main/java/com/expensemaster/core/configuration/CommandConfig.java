@@ -1,7 +1,7 @@
-package com.expensemaster.infra.configuration;
+package com.expensemaster.core.configuration;
 
-import com.expensemaster.infra.SpanAdapter;
-import com.expensemaster.infra.queue.Command;
+import com.expensemaster.core.SpanAdapter;
+import com.expensemaster.core.queue.Command;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Configuration;
 

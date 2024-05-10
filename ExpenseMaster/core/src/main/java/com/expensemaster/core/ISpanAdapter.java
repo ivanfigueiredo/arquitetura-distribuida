@@ -1,4 +1,4 @@
-package com.expensemaster.infra;
+package com.expensemaster.core;
 
 import com.expensemaster.application.ICallback;
 import jakarta.servlet.http.HttpServletRequest;

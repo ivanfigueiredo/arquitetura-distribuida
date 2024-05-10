@@ -1,7 +1,8 @@
-package com.expensemaster.infra;
+package com.expensemaster.core;
 
 import com.expensemaster.application.ICallback;
 import com.expensemaster.application.IApplicationSpan;
+import com.expensemaster.user.IUserSpan;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
@@ -15,7 +16,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Component
-public class SpanAdapter implements IApplicationSpan, ISpanAdapter {
+public class SpanAdapter implements IApplicationSpan, IUserSpan, ISpanAdapter {
     private final Tracer tracer;
     private final TextMapPropagator textMapPropagator;
     private HttpServletRequest request;

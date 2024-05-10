@@ -1,4 +1,4 @@
-package com.expensemaster.infra.configuration;
+package com.expensemaster.core.configuration;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

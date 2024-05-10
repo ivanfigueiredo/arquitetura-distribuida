@@ -1,7 +1,7 @@
-package com.expensemaster.infra.configuration;
+package com.expensemaster.core.configuration;
 
 import com.expensemaster.application.IApplicationSpan;
-import com.expensemaster.infra.SpanAdapter;
+import com.expensemaster.core.SpanAdapter;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import org.springframework.context.annotation.Bean;

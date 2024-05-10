@@ -22,6 +22,6 @@ public class UserService implements IUserService {
     public void createUser(final CreateUserDto dto) {
         final var exchange = "user.events";
         final var routingKey = "user.created";
-        this.userSpan.startSpan("application.user.createuser", () -> this.command.<CreateUserDto>sendCommand(exchange, routingKey, dto));
+        this.userSpan.startSpan("application.create.user", () -> this.command.<CreateUserDto>sendCommand(exchange, routingKey, dto));
     }
 }

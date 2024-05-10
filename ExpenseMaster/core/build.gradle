@@ -13,7 +13,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.3'
 }
 
-group = 'com.expensemaster.infra'
+group = 'com.expensemaster.core'
 version = '1.0-SNAPSHOT'
 
 tasks.named("bootJar") {

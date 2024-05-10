@@ -1,4 +1,4 @@
-package com.expensemaster.infra.configuration;
+package com.expensemaster.core.configuration;
 
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

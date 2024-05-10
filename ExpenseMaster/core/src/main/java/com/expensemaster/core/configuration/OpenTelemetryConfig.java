@@ -1,4 +1,4 @@
-package com.expensemaster.infra.configuration;
+package com.expensemaster.core.configuration;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;

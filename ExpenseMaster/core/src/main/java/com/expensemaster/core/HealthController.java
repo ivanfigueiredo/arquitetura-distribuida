@@ -1,4 +1,4 @@
-package com.expensemaster.infra;
+package com.expensemaster.core;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

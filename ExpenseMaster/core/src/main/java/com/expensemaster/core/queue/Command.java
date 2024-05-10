@@ -1,7 +1,7 @@
-package com.expensemaster.infra.queue;
+package com.expensemaster.core.queue;
 
 import com.expensemaster.application.user.Queue.ICommand;
-import com.expensemaster.infra.ISpanAdapter;
+import com.expensemaster.core.ISpanAdapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.Message;
@@ -33,7 +33,7 @@ public class Command implements ICommand {
             rabbitTemplate.setExchange(exchange);
             rabbitTemplate.setRoutingKey(routingKey);
             final var message = new Message(payload.getBytes(), context);
-            rabbitTemplate.convertAndSend(message);
+            spanAdapter.startSpan("producer.create.user.event", () -> rabbitTemplate.convertAndSend(message));
             System.out.println("Message sent successfully");
         } catch (JsonProcessingException e) {
             System.err.println(e.getMessage());

@@ -1,4 +1,4 @@
-package com.expensemaster.infra;
+package com.expensemaster.core;
 
 import io.opentelemetry.context.propagation.TextMapGetter;
 import jakarta.servlet.http.HttpServletRequest;

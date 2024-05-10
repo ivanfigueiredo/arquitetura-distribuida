@@ -1,4 +1,4 @@
-package com.expensemaster.user.configuration;
+package com.expensemaster.core.configuration;
 
 import com.expensemaster.application.user.IUserService;
 import com.expensemaster.application.user.UserService;
