@@ -31,7 +31,7 @@ services:
       timeout: 10s
       retries: 3
     volumes:
-      - ./volumes/kong/kong.yml:/kong/declarative/kong.yml
+      - ./kong/kong.yml:/kong/declarative/kong.yml
     ports:
       - "8000:8000"
       - "8443:8443"
@@ -67,17 +67,6 @@ services:
     networks:
       - expense
 
-  auth:
-    build:
-      context: ./auth
-      dockerfile: Dockerfile
-    container_name: auth
-    restart: always
-    networks:
-      - expense
-    depends_on:
-      - mongo
-
   mongo:
     container_name: wm-mongo
     image: mongo:4.4.7-focal
@@ -111,7 +100,7 @@ services:
     container_name: user_create
     restart: always
     build:
-      context: ./create-user
+      context: ./user/create-user
       dockerfile: Dockerfile
     networks:
       - expense
@@ -119,6 +108,17 @@ services:
       - queue
       - mongo
       - opentelemetry-collector
+
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    container_name: auth
+    restart: always
+    networks:
+      - expense
+    depends_on:
+      - mongo
 
   bus:
     container_name: bus_app
