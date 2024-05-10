@@ -1,9 +1,9 @@
-package com.expensemaster.infra.configuration;
+package com.expensemaster.user.configuration;
 
 import com.expensemaster.application.user.IUserService;
 import com.expensemaster.application.user.UserService;
-import com.expensemaster.infra.queue.Command;
-import com.expensemaster.infra.SpanAdapter;
+import com.expensemaster.core.queue.Command;
+import com.expensemaster.core.SpanAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

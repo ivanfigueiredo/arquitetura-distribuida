@@ -7,7 +7,7 @@ server:
 
 spring:
   rabbitmq:
-    host: rabbitMQ
+    host: localhost
     port: 5672
     username: rabbitmq
     password: rabbitmq
@@ -15,4 +15,4 @@ spring:
 expense:
   master:
     otlp:
-      tracing-server: "http://opentelemetry-collector:4318/v1/traces"
+      tracing-server: "http://localhost:4318/v1/traces"
