@@ -1,7 +1,9 @@
 package com.expensemaster.core.configuration;
 
 import com.expensemaster.application.IApplicationSpan;
+import com.expensemaster.core.ISpanAdapter;
 import com.expensemaster.core.SpanAdapter;
+import com.expensemaster.user.IUserSpan;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +25,7 @@ public class SpanConfig {
     }
 
     @Bean
-    public IApplicationSpan createUserSpan() {
+    public ISpanAdapter createSpanAdapter() {
         return new SpanAdapter(tracer, textMapPropagator);
     }
 }
