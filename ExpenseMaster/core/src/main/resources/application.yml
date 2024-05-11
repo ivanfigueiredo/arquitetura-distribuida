@@ -16,3 +16,7 @@ expense:
   master:
     otlp:
       tracing-server: "http://opentelemetry-collector:4318/v1/traces"
+
+user:
+  auth:
+    hostname: http://auth:6000
