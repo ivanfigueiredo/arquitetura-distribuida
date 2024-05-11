@@ -13,12 +13,6 @@ export class ExpressAdapter implements HttpClient {
     on(method: string, url: string, callback: Function): void {
         this.connect[method](url, async (req: Request, res: Response) => {
             try {
-                console.log('===================>>>>> HEADERS', req.headers);
-                const correlationId = req.headers['x-correlation-id']
-                console.log('======================>>>> CorrelationId', correlationId);
-                if (correlationId && typeof correlationId === 'string') {
-                    this.traceContext.set({correlationId});
-                }
                 const output = await callback(req.params, req.body);
                 res.json(output);
             } catch (error: any) {

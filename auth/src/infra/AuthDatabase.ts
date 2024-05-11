@@ -10,11 +10,6 @@ export class AuthDatabase implements IUserDAO {
 
     async findUserByEmail(email: string): Promise<any> {
         try {
-
-            const context = this.traceContext.get();
-
-            console.log('==================>>>>>>>> Restore', context)
-
             const query = await this.connection.getCollection('users');
             const user = await query.findOne({email})
             if (!user) throw new Error("Email or password invalid")
