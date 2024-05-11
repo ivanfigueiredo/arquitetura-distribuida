@@ -68,7 +68,7 @@ services:
           header_name: X-Correlation-ID
   - name: auth
     host: default_upstream
-    url: http://auth:6000/auth
+    url: http://bus:8080/auth/login
     routes:
       - name: Auth
         paths:
@@ -80,6 +80,9 @@ services:
         config:
           minute: 10
           limit_by: ip
+      - name: opentelemetry
+        config:
+          endpoint: http://opentelemetry-collector:4318/v1/traces
       - name: cors
         config:
           origins: ["*"]
