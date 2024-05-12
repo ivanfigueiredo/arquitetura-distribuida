@@ -1,5 +1,5 @@
 import { HttpClient } from "./HttpClient";
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 
 export class ExpressAdapter implements HttpClient {
     connect: any;
