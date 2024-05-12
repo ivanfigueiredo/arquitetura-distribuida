@@ -13,8 +13,6 @@
   "dependencies": {
     "amqplib": "^0.10.3",
     "express": "^4.19.2",
-    "kafka-node": "^5.0.0",
-    "node-rdkafka": "^3.0.1",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
