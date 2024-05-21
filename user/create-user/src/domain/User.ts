@@ -1,20 +1,21 @@
 import { randomUUID } from "crypto"
+import { Password } from "./Password";
+import { UserTypes } from "./UserTypes";
 
 export class User {
     private constructor(
-        readonly id: string,
-        readonly name: string,
+        readonly userId: string,
         readonly email: string,
-        readonly password: string,
-        readonly birthdate: string,
+        readonly password: Password,
+        readonly userType: string
     ) {}
 
-    public static create(name: string, email: string, password: string, birthdate: string): User {
+    public static create(email: string, password: string, userType: string): User {
         const id = randomUUID();
-        return new User(id, name, email, password, birthdate);
+        return new User(id, email, Password.create(password), UserTypes[userType]);
     }
 
-    public static restore(id: string, name: string, email: string, password: string, birthdate: string): User {
-        return new User(id, name, email, password, birthdate);
+    public static restore(userId: string, email: string, password: string, userType: string): User {
+        return new User(userId, email, Password.restore(password), userType);
     }
 }
