@@ -1,4 +1,4 @@
-package com.expensemaster.user.auth.exceptions;
+package com.expensemaster.user.exceptions;
 public abstract class NoStacktraceException extends RuntimeException {
     protected NoStacktraceException(final String message) {
         this(message, null);

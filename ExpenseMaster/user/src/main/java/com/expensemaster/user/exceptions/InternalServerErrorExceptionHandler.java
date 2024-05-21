@@ -1,4 +1,4 @@
-package com.expensemaster.user.auth.exceptions;
+package com.expensemaster.user.exceptions;
 
 import org.springframework.http.HttpStatus;
 

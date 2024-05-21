@@ -1,4 +1,4 @@
-package com.expensemaster.user.auth.exceptions;
+package com.expensemaster.user.exceptions;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,7 +10,8 @@ public class ApiExceptionHandler {
 
     public ApiExceptionHandler() {
         final var internalServerErrorHandler = new InternalServerErrorExceptionHandler();
-        this.apiExpcetionBaseHandler = new UnauthorizedExceptionHandler(internalServerErrorHandler);
+        final var unauthorizedExceptionHandler = new UnauthorizedExceptionHandler(internalServerErrorHandler);
+        this.apiExpcetionBaseHandler = new UnprocessableEntityExceptionHandler(unauthorizedExceptionHandler);
     }
 
     @ExceptionHandler(value = {NoStacktraceException.class})

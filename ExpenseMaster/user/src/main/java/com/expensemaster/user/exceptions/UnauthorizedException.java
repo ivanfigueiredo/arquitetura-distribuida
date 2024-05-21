@@ -1,4 +1,4 @@
-package com.expensemaster.user.auth.exceptions;
+package com.expensemaster.user.exceptions;
 
 public class UnauthorizedException extends NoStacktraceException {
     public UnauthorizedException(String message) {

@@ -1,4 +1,4 @@
-package com.expensemaster.user.auth.exceptions;
+package com.expensemaster.user.exceptions;
 
 public interface ApiExpcetionBaseHandler {
     ApiExpcetionBaseHandler next = null;

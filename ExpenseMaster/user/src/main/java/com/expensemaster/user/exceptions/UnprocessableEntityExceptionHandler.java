@@ -5,19 +5,19 @@ import org.springframework.http.HttpStatus;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class UnauthorizedExceptionHandler implements ApiExpcetionBaseHandler {
+public class UnprocessableEntityExceptionHandler implements ApiExpcetionBaseHandler {
     private ApiExpcetionBaseHandler next = null;
 
-    public UnauthorizedExceptionHandler(final ApiExpcetionBaseHandler next) {
+    public UnprocessableEntityExceptionHandler(final ApiExpcetionBaseHandler next) {
         this.next = next;
     }
 
-    public UnauthorizedExceptionHandler() {}
+    public UnprocessableEntityExceptionHandler() {}
 
     @Override
     public ApiExceptionBaseOutputDto handle(NoStacktraceException e) {
-        if (e instanceof UnauthorizedException) {
-            HttpStatus status = HttpStatus.UNAUTHORIZED;
+        if (e instanceof UnprocessableEntityException) {
+            HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
             ApiException apiException = new ApiException(
                     e.getMessage(),
                     e,
