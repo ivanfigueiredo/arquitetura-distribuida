@@ -21,7 +21,6 @@ services:
       KONG_ADMIN_GUI_URL: http://localhost:8002
 
     depends_on:
-      - auth
       - bus
       - opentelemetry-collector
 
@@ -33,7 +32,7 @@ services:
     volumes:
       - ./kong/kong.yml:/kong/declarative/kong.yml
     ports:
-      - "8000:8000"
+      - "8004:8000"
       - "8443:8443"
       - "8002:8002"
       - "8001:8001"
@@ -67,18 +66,6 @@ services:
     networks:
       - expense
 
-  mongo:
-    container_name: wm-mongo
-    image: mongo:4.4.7-focal
-    ports:
-      - 27017:27017
-    environment:
-      - MONGO_INITDB_DATABASE=Test
-      - MONGO_INITDB_ROOT_USERNAME=ROOT
-      - MONGO_INITDB_ROOT_PASSWORD=ROOT
-    networks:
-      - expense
-
   queue:
     container_name: rabbitMQ
     image: rabbitmq:3-management
@@ -104,21 +91,21 @@ services:
       dockerfile: Dockerfile
     networks:
       - expense
+      - user
     depends_on:
       - queue
-      - mongo
+      - user_db
       - opentelemetry-collector
+      - flyway_db_user
 
-  auth:
-    build:
-      context: ./auth
-      dockerfile: Dockerfile
-    container_name: auth
-    restart: always
-    networks:
-      - expense
-    depends_on:
-      - mongo
+  # auth:
+  #   build:
+  #     context: ./auth
+  #     dockerfile: Dockerfile
+  #   container_name: auth
+  #   restart: always
+  #   networks:
+  #     - expense
 
   bus:
     container_name: bus_app
@@ -132,9 +119,84 @@ services:
       - queue
       - opentelemetry-collector
 
+  flyway_db_client:
+    image: flyway/flyway
+    container_name: flyway_db_client
+    volumes:
+      - ./volumes/flyway/client_db:/flyway/sql
+    command: -url=jdbc:postgresql://client_db:5432/client_database -user=postgres_client -password=postgres_client migrate
+    depends_on:
+      - client_db
+    networks:
+      - client
+
+  client_db:
+    image: postgres:latest
+    container_name: client_db
+    environment:
+      POSTGRES_USER: postgres_client
+      POSTGRES_PASSWORD: postgres_client
+      POSTGRES_DB: client_database
+    networks:
+      - client
+    ports:
+      - 5432:5432
+
+  flyway_db_account:
+    image: flyway/flyway
+    container_name: flyway_db_account
+    volumes:
+      - ./volumes/flyway/account_db:/flyway/sql
+    command: -url=jdbc:postgresql://account_db:5432/account_database -user=postgres_account -password=postgres_account migrate
+    depends_on:
+      - account_db
+    networks:
+      - account
+
+  account_db:
+    image: postgres:latest
+    container_name: account_db
+    environment:
+      POSTGRES_USER: postgres_account
+      POSTGRES_PASSWORD: postgres_account
+      POSTGRES_DB: account_database
+    networks:
+      - account
+    ports:
+      - 5433:5432
+
+  flyway_db_user:
+    image: flyway/flyway
+    container_name: flyway_db_user
+    volumes:
+      - ./volumes/flyway/user_db:/flyway/sql
+    command: -url=jdbc:postgresql://user_db:5432/user_database -user=postgres_user -password=postgres_user migrate
+    depends_on:
+      - user_db
+    networks:
+      - user
+
+  user_db:
+    image: postgres:latest
+    container_name: user_db
+    environment:
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_user
+      POSTGRES_DB: user_database
+    networks:
+      - user
+    ports:
+      - 5434:5432
+
 volumes:
   rabbitmq-data:
 
 networks:
+  user:
+    driver: bridge
+  account:
+    driver: bridge
   expense:
+    driver: bridge
+  client:
     driver: bridge
