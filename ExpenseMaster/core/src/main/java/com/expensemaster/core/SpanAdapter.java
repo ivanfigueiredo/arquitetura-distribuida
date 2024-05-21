@@ -10,9 +10,12 @@ import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -46,7 +49,7 @@ public class SpanAdapter implements IApplicationSpan, IUserSpan, ISpanAdapter {
     }
 
     @Override
-    public MessageProperties contextPropagation() {
+    public MessageProperties contextPropagationQueue() {
         final var correlationId = this.request.getHeader("x-correlation-id");
         final var messageProperties = new MessageProperties();
         final var context = this.makeContext(this.request, this.textMapPropagator);
@@ -57,6 +60,13 @@ public class SpanAdapter implements IApplicationSpan, IUserSpan, ISpanAdapter {
         });
 
         return messageProperties;
+    }
+
+    @Override
+    public List<ClientHttpRequestInterceptor> contextPropagationApi() {
+        List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+        interceptors.add(new HeaderPropagationInterceptor(this.request));
+        return interceptors;
     }
 
     private Context makeContext(final HttpServletRequest request, final TextMapPropagator textMapPropagator) {
