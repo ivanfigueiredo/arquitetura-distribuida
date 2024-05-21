@@ -3,14 +3,12 @@ package com.expensemaster.user.auth;
 import com.expensemaster.application.auth.AuthDto;
 import com.expensemaster.application.auth.AuthOutputDto;
 import com.expensemaster.application.auth.IAuthGateway;
-import com.expensemaster.user.auth.exceptions.InternalServerErrorException;
-import com.expensemaster.user.auth.exceptions.UnauthorizedException;
+import com.expensemaster.user.exceptions.InternalServerErrorException;
+import com.expensemaster.user.exceptions.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Objects;
 
 @Component
 public class AuthGateway implements IAuthGateway {
