@@ -1,22 +1,37 @@
 import { HttpClient } from "./HttpClient";
 import express, { Request, Response } from 'express';
+import { ISpan } from "./ISpan";
+import { DomainException } from "../domain/exception/DomainException";
+import { randomUUID } from "crypto";
+import { InternalServerErrorException } from "./exceptions/InternalServerErrorException";
 
 export class ExpressAdapter implements HttpClient {
     connect: any;
 
-    constructor() {
+    constructor(private readonly context: ISpan) {
         this.connect = express();
         this.connect.use(express.json());
     }
 
     on(method: string, url: string, callback: Function): void {
-        this.connect[method](url, async function (req: Request, res: Response) {
+        this.connect[method](url, async (req: Request, res: Response) => {
             try {
-                console.log('===================>>>>> HEADERS', req.headers);
-                const output = await callback(req.params, req.body);
-                res.json(output);
-            } catch (error: unknown) {
-                console.log('============>>>> ERROR');
+                const traceparent = req.headers['traceparent'] as string;
+                this.context.setHeaders({
+                    correlationId: randomUUID(),
+                    traceparent
+                });
+                await this.context.startSpan("create.user.event", async () => {
+                    const output = await callback(req.params, req.body);
+                    res.json(output);
+                });
+            } catch (error: any) {
+                if (error instanceof DomainException) {
+                    res.status(error.status).json(error.message);
+                }
+                if (error instanceof InternalServerErrorException) {
+                    res.status(error.status).json(error.message)
+                }
             }
         });
     }

@@ -2,7 +2,7 @@ import { trace, context } from '@opentelemetry/api';
 import { Headers, ISpan } from "./ISpan";
 import { IApplicationSpan } from '../application/IApplicationSpan';
 
-export class SpanAdapter implements ISpan,IApplicationSpan {
+export class SpanAdapter implements ISpan, IApplicationSpan {
     private headers?: Headers;
     private readonly SERVICE_NAME = "create.user.service";
     private readonly SERVICE_VERSION = "0.0.1";
