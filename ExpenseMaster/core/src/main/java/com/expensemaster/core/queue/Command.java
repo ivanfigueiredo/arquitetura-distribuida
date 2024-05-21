@@ -28,7 +28,7 @@ public class Command implements ICommand {
     public <T> void sendCommand(String exchange, String routingKey, T data) {
         final var mapper = new ObjectMapper();
         try {
-            final var context = this.spanAdapter.contextPropagation();
+            final var context = this.spanAdapter.contextPropagationQueue();
             final var payload = mapper.writeValueAsString(data);
             rabbitTemplate.setExchange(exchange);
             rabbitTemplate.setRoutingKey(routingKey);
