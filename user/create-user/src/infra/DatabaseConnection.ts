@@ -1,6 +1,6 @@
-import { Collection } from "mongodb";
+import { DataSource } from "typeorm";
 
 export interface DatabaseConnection {
-    close(): Promise<void>;
-    getCollection(collection: string): Promise<Collection>; 
+    init(): Promise<void>;
+    getDataSourcer(): DataSource;
 }
