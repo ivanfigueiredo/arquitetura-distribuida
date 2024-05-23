@@ -18,7 +18,7 @@ services:
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
-      KONG_ADMIN_GUI_URL: http://localhost:8002
+      # KONG_ADMIN_GUI_URL: http://localhost:8002
 
     depends_on:
       - bus
@@ -34,7 +34,7 @@ services:
     ports:
       - "8004:8000"
       - "8443:8443"
-      - "8002:8002"
+      # - "8002:8002"
       - "8001:8001"
       - "8444:8444"
 
@@ -98,14 +98,22 @@ services:
       - opentelemetry-collector
       - flyway_db_user
 
-  # auth:
-  #   build:
-  #     context: ./auth
-  #     dockerfile: Dockerfile
-  #   container_name: auth
-  #   restart: always
-  #   networks:
-  #     - expense
+  auth:
+    build:
+      context: ./user/auth
+      dockerfile: Dockerfile
+    container_name: auth
+    restart: always
+    environment:
+      KEY: "a2f6f906-a3d6-4a4e-bcaf-25e133151600"
+      SECRET_KEY: "fb0557e8-a202-495c-9eda-94fa65c33070"
+    networks:
+      - expense
+      - user
+    depends_on:
+      - user_db
+      - opentelemetry-collector
+      - flyway_db_user
 
   bus:
     container_name: bus_app

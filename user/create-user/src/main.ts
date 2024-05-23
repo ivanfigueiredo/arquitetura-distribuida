@@ -19,7 +19,7 @@ async function init() {
     await database.init();
     const unitOfWork = new UnitOfWork(database);
     const userDatabase = new UserDatabase(unitOfWork);
-    const createUser = new CreateUser(userDatabase, unitOfWork, spanAdapter);
+    const createUser = new CreateUser(userDatabase, unitOfWork);
     new MainCoontroller(spanAdapter, expressAdapter, createUser);
     new QueueController(queue, createUser);
 

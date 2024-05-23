@@ -35,6 +35,7 @@ public class CreateUserGateway implements ICreateUserGateway {
             restTemplate.setInterceptors(interceptors);
             return this.restTemplate.postForObject(this.hostname + "/create-user", dto, UserCreatedDto.class);
         } catch (RestClientException e) {
+            System.out.println("========================>>>>>>>> CREATE" + e.getMessage());
             final var error = "A senha não é válida. Ela deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um dígito e um caractere especial.";
             if (e.getMessage().contains(error)) {
                 throw new UnprocessableEntityException(error);

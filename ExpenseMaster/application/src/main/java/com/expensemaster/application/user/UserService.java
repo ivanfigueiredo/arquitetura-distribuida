@@ -20,11 +20,6 @@ public class UserService implements IUserService {
     }
     @Override
     public UserCreatedDto createUser(final CreateUserDto dto) {
-        AtomicReference<UserCreatedDto> output = new AtomicReference<UserCreatedDto>();
-        this.userSpan.startSpan("application.create.user", () -> {
-           output.set(this.createUserGateway.createUser(dto));
-        });
-
-        return output.get();
+        return this.createUserGateway.createUser(dto);
     }
 }

@@ -1,7 +1,7 @@
 import { HttpClient } from "./HttpClient";
 import express, { Request, Response } from 'express';
 import { ISpan } from "./ISpan";
-import { DomainException } from "../domain/exception/DomainException";
+import { UnauthorizedException } from "./exceptions/UnauthorizedException";
 import { InternalServerErrorException } from "./exceptions/InternalServerErrorException";
 
 export class ExpressAdapter implements HttpClient {
@@ -18,13 +18,13 @@ export class ExpressAdapter implements HttpClient {
                 const traceparent = req.headers['traceparent'] as string;
                 const correlationId = req.headers['correlationid'] as string;
                 this.context.setContext({correlationId, traceparent});
-                this.context.startSpan("create.user.service")
+                this.context.startSpan('auth.service');
                 const output = await callback(req.params, req.body);
-                this.context.endSpan()
+                this.context.endSpan();
                 res.json(output);
             } catch (error: any) {
-                if (error instanceof DomainException) {
-                    res.status(error.status).json(error.message);
+                if (error instanceof UnauthorizedException) {
+                    res.status(error.status).json({message: error.message});
                 }
                 if (error instanceof InternalServerErrorException) {
                     res.status(error.status).json(error.message)

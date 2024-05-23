@@ -15,13 +15,13 @@ export class RabbitMQAdapter implements Queue {
         const channel = await this.connection.createChannel();
 		await channel.assertQueue(queueName, { durable: true });
 		channel.consume(queueName, async (msg: any)=> {
-			this.context.setHeaders({
-				correlationId: msg.properties.headers.correlationId,
-				traceparent: msg.properties.headers.traceparent
-			});
+			// this.context.setHeaders({
+			// 	correlationId: msg.properties.headers.correlationId,
+			// 	traceparent: msg.properties.headers.traceparent
+			// });
 			const input = JSON.parse(msg.content.toString());
 			try {
-				await this.context.startSpan("create.user.event", async () => await callback(input));
+				await callback(input);
 				channel.ack(msg);
 			} catch (e: any) {
 				console.log(e.message);

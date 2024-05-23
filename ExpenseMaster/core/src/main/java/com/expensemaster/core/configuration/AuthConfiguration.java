@@ -3,6 +3,7 @@ package com.expensemaster.core.configuration;
 import com.expensemaster.application.auth.AuthAutenticator;
 import com.expensemaster.application.auth.IAuthAutenticator;
 import com.expensemaster.application.auth.IAuthGateway;
+import com.expensemaster.core.SpanAdapter;
 import com.expensemaster.user.auth.AuthGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +12,8 @@ import org.springframework.context.annotation.Configuration;
 public class AuthConfiguration {
 
     @Bean
-    public IAuthGateway createAuthGateway() {
-        return new AuthGateway();
+    public IAuthGateway createAuthGateway(final SpanAdapter spanAdapter) {
+        return new AuthGateway(spanAdapter);
     }
 
     @Bean

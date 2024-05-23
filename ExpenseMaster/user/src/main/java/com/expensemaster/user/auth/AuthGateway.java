@@ -3,12 +3,16 @@ package com.expensemaster.user.auth;
 import com.expensemaster.application.auth.AuthDto;
 import com.expensemaster.application.auth.AuthOutputDto;
 import com.expensemaster.application.auth.IAuthGateway;
+import com.expensemaster.user.IUserSpan;
 import com.expensemaster.user.exceptions.InternalServerErrorException;
 import com.expensemaster.user.exceptions.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
 
 @Component
 public class AuthGateway implements IAuthGateway {
@@ -18,19 +22,22 @@ public class AuthGateway implements IAuthGateway {
 
     private final RestTemplate restTemplate;
 
-    public AuthGateway() {
+    private final IUserSpan userSpan;
+
+    public AuthGateway(final IUserSpan userSpan) {
         this.restTemplate = new RestTemplate();
+        this.userSpan = Objects.requireNonNull(userSpan);
     }
 
     @Override
     public AuthOutputDto auth(AuthDto dto) {
         try {
+            final var interceptors = this.userSpan.contextPropagationApi();
+            restTemplate.setInterceptors(interceptors);
             return this.restTemplate.postForObject(this.hostname + "/auth", dto, AuthOutputDto.class);
         } catch (RestClientException e) {
-            final var error = "500 Internal Server Error: \"{\"message\":\"Email or password invalid\"}\"";
-            if (e.getMessage().contentEquals(error)) {
-                final var message = e.getMessage().split(": ")[1].split(":")[1].split("}")[0];
-                throw new UnauthorizedException(message);
+            if (e.getMessage().contains("401")) {
+                throw new UnauthorizedException("Email or password invalid");
             }
             throw new InternalServerErrorException(e.getMessage());
         }
