@@ -9,8 +9,7 @@ export class MainCoontroller {
         readonly createUser: ICreateUser
     ) {
         httpClient.on("post", "/create-user", async function (params: any, data: any) {
-            let output = {};
-            await context.startSpan("create.user.event", async () => {output = await createUser.execute(data)});
+            const output = await createUser.execute(data);
             return output;
 		});
     }

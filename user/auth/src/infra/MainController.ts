@@ -1,13 +1,15 @@
-import { IUserService } from '../application/IUserService';
+import { IAuth } from '../application/IAuth';
 import { HttpClient } from "./HttpClient"
+import { ISpan } from './ISpan';
 
-export class MainCoontroller {
+export class MainController {
     constructor(
         readonly httpClient: HttpClient,
-        readonly userService: IUserService
+        readonly usecase: IAuth
     ) {
         httpClient.on("post", "/auth", async function (params: any, data: any) {
-            return userService.auth(data);
-		});
+            const output = await usecase.execute(data);
+            return output;
+        });
     }
 }
