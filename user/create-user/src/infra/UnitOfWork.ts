@@ -2,6 +2,7 @@ import { QueryRunner } from 'typeorm';
 import { IUnitOfWorkApplication } from '../application/IUnitOfWorkApplication';
 import { IUnitOfWorkInfra } from './IUnitOfWorkInfra';
 import { DatabaseConnection } from './DatabaseConnection';
+import { UserEntity } from './entities/UserEntity';
 
 export class UnitOfWork implements IUnitOfWorkInfra, IUnitOfWorkApplication {
   private readonly queryRunner: QueryRunner;
@@ -15,8 +16,8 @@ export class UnitOfWork implements IUnitOfWorkInfra, IUnitOfWorkApplication {
     await this.queryRunner.startTransaction();
   }
 
-  public async transaction(data: any): Promise<void> {
-    await this.queryRunner.manager.save(data);
+  public async transaction(data: UserEntity): Promise<void> {
+    await this.queryRunner.manager.save<UserEntity>(data);
   }
 
   public async commit(): Promise<void> {
