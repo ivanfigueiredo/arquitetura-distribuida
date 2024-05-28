@@ -1,0 +1,21 @@
+FROM node:21-alpine3.18 AS stageOne
+WORKDIR /build
+COPY ./core .
+RUN npm install 
+RUN npm run build
+
+FROM node:21-alpine3.18 AS stageTwo
+WORKDIR /build
+WORKDIR /core
+COPY --from=stageOne /build/ .
+RUN cd ..
+WORKDIR /client/registration
+COPY ./client/Registration/ .
+RUN npm install
+RUN npm run build
+
+FROM node:21-alpine3.18 AS production
+WORKDIR /app
+COPY --from=stageTwo /client/registration/dist .
+EXPOSE 9001
+CMD ["node", "./main.js"]
