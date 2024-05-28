@@ -8,8 +8,8 @@ CREATE TABLE "client" (
     client_id VARCHAR(36) NOT NULL PRIMARY KEY,
     name VARCHAR(255) NULL,
     company_reason VARCHAR(255) NULL,
-    password VARCHAR(255) NOT NULL,
     client_type VARCHAR(2) NOT NULL,
+    user_id VARCHAR(36) NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
