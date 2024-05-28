@@ -87,8 +87,8 @@ services:
     container_name: user_create
     restart: always
     build:
-      context: ./user/create-user
-      dockerfile: Dockerfile
+      context: ./ExpenseCore
+      dockerfile: Dockerfile_user
     networks:
       - expense
       - user
@@ -98,10 +98,25 @@ services:
       - opentelemetry-collector
       - flyway_db_user
 
+  client_registration:
+    container_name: client_registration
+    restart: always
+    build:
+      context: ./ExpenseCore
+      dockerfile: Dockerfile_client_registration
+    networks:
+      - expense
+      - client
+    depends_on:
+      - queue
+      - client_db
+      - opentelemetry-collector
+      - flyway_db_client
+
   auth:
     build:
-      context: ./user/auth
-      dockerfile: Dockerfile
+      context: ./ExpenseCore
+      dockerfile: Dockerfile_auth
     container_name: auth
     restart: always
     environment:
@@ -150,28 +165,28 @@ services:
     ports:
       - 5432:5432
 
-  flyway_db_account:
-    image: flyway/flyway
-    container_name: flyway_db_account
-    volumes:
-      - ./volumes/flyway/account_db:/flyway/sql
-    command: -url=jdbc:postgresql://account_db:5432/account_database -user=postgres_account -password=postgres_account migrate
-    depends_on:
-      - account_db
-    networks:
-      - account
+  # flyway_db_account:
+  #   image: flyway/flyway
+  #   container_name: flyway_db_account
+  #   volumes:
+  #     - ./volumes/flyway/account_db:/flyway/sql
+  #   command: -url=jdbc:postgresql://account_db:5432/account_database -user=postgres_account -password=postgres_account migrate
+  #   depends_on:
+  #     - account_db
+  #   networks:
+  #     - account
 
-  account_db:
-    image: postgres:latest
-    container_name: account_db
-    environment:
-      POSTGRES_USER: postgres_account
-      POSTGRES_PASSWORD: postgres_account
-      POSTGRES_DB: account_database
-    networks:
-      - account
-    ports:
-      - 5433:5432
+  # account_db:
+  #   image: postgres:latest
+  #   container_name: account_db
+  #   environment:
+  #     POSTGRES_USER: postgres_account
+  #     POSTGRES_PASSWORD: postgres_account
+  #     POSTGRES_DB: account_database
+  #   networks:
+  #     - account
+  #   ports:
+  #     - 5433:5432
 
   flyway_db_user:
     image: flyway/flyway
