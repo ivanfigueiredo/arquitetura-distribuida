@@ -2,16 +2,11 @@ package com.expensemaster.core.configuration;
 
 import com.expensemaster.application.user.ICreateUserGateway;
 import com.expensemaster.application.user.IUserService;
-import com.expensemaster.application.user.Queue.ICommand;
 import com.expensemaster.application.user.UserService;
-import com.expensemaster.core.queue.Command;
 import com.expensemaster.core.SpanAdapter;
-import com.expensemaster.user.api.CreateUserGateway;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.expensemaster.user.user.CreateUserGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Objects;
 
 @Configuration
 public class UserServiceConfig {

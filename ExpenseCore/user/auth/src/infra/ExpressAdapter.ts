@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import { UnauthorizedException } from "./exceptions/UnauthorizedException";
 import { InternalServerErrorException } from "./exceptions/InternalServerErrorException";
 import { ISpan } from "expense-core";
+import { DomainException } from "../domain/exception/DomainException";
 
 export class ExpressAdapter implements HttpClient {
     connect: any;
@@ -23,6 +24,9 @@ export class ExpressAdapter implements HttpClient {
                 this.context.endSpan();
                 res.json(output);
             } catch (error: any) {
+                if (error instanceof DomainException) {
+                    res.status(error.status).json(error.message);
+                }
                 if (error instanceof UnauthorizedException) {
                     res.status(error.status).json({ message: error.message });
                 }

@@ -1,4 +1,4 @@
-package com.expensemaster.user.api.input;
+package com.expensemaster.user.user.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
