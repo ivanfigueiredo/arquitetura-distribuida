@@ -1,7 +1,7 @@
-package com.expensemaster.user.api;
+package com.expensemaster.user.user;
 
 import com.expensemaster.application.user.UserCreatedDto;
-import com.expensemaster.user.api.input.CreateUserInput;
+import com.expensemaster.user.user.input.CreateUserInput;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

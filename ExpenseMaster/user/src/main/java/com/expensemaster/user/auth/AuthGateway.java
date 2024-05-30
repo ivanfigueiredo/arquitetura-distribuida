@@ -6,6 +6,7 @@ import com.expensemaster.application.auth.IAuthGateway;
 import com.expensemaster.user.IUserSpan;
 import com.expensemaster.user.exceptions.InternalServerErrorException;
 import com.expensemaster.user.exceptions.UnauthorizedException;
+import com.expensemaster.user.exceptions.UnprocessableEntityException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,6 +39,9 @@ public class AuthGateway implements IAuthGateway {
         } catch (RestClientException e) {
             if (e.getMessage().contains("401")) {
                 throw new UnauthorizedException("Email or password invalid");
+            }
+            if (e.getMessage().contains("Email has not been verified.")) {
+                throw new UnprocessableEntityException("Email has not been verified.");
             }
             throw new InternalServerErrorException(e.getMessage());
         }

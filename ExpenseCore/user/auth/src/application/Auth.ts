@@ -5,16 +5,14 @@ import { IUserRepository } from "./IUserRepository";
 import { UnauthorizedException } from "../infra/exceptions/UnauthorizedException";
 
 export class Auth implements IAuth {
-    constructor(private readonly userRepository: IUserRepository) {}
+    constructor(private readonly userRepository: IUserRepository) { }
 
     async execute(dto: SignInDto): Promise<Output> {
         const user = await this.userRepository.findUserByEmail(dto.email);
         if (!user.password.passwordMatches(dto.password)) {
             throw new UnauthorizedException('Email or password invalid', 401);
         }
-        console.log('============================>>>>>>>> PASSOU');
-        const token = JWT.createToken(user);
-        console.log('============================>>>>>>>> PASSOU');
-        return {token}
+        const token = JWT.createToken(user, '1h');
+        return { token }
     }
 }

@@ -1,10 +1,10 @@
-package com.expensemaster.user.api;
+package com.expensemaster.user.user;
 
 import com.expensemaster.application.user.IUserService;
 import com.expensemaster.application.user.UserCreatedDto;
 import com.expensemaster.application.user.dto.CreateUserDto;
 import com.expensemaster.user.IUserSpan;
-import com.expensemaster.user.api.input.CreateUserInput;
+import com.expensemaster.user.user.input.CreateUserInput;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

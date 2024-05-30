@@ -1,11 +1,10 @@
-package com.expensemaster.user.api;
+package com.expensemaster.user.user;
 
 import com.expensemaster.application.user.ICreateUserGateway;
 import com.expensemaster.application.user.UserCreatedDto;
 import com.expensemaster.application.user.dto.CreateUserDto;
 import com.expensemaster.user.IUserSpan;
 import com.expensemaster.user.exceptions.InternalServerErrorException;
-import com.expensemaster.user.exceptions.UnauthorizedException;
 import com.expensemaster.user.exceptions.UnprocessableEntityException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
