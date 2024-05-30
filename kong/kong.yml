@@ -58,6 +58,8 @@ services:
       - name: opentelemetry
         config:
           endpoint: http://opentelemetry-collector:4318/v1/traces
+          resource_attributes:
+            service.name: gateway.user.create
       - name: cors
         config:
           origins: ["*"]
@@ -83,6 +85,8 @@ services:
       - name: opentelemetry
         config:
           endpoint: http://opentelemetry-collector:4318/v1/traces
+          resource_attributes: 
+            service.name: gateway.user.auth
       - name: cors
         config:
           origins: ["*"]
