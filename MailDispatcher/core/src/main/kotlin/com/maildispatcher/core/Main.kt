@@ -1,4 +1,4 @@
 package com.maildispatcher.core
 
-class Main {
+open class Main {
 }
