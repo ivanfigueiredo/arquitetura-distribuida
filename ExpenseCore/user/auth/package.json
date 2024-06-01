@@ -12,17 +12,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.2",
+    "expense-core": "file:../../core",
     "express": "^4.19.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.5",
     "reflect-metadata": "^0.2.2",
-    "expense-core": "file:../../core",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typeorm": "^0.3.20",
     "typescript": "^4.9.5"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.12.7",

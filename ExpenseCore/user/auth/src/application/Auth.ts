@@ -12,7 +12,7 @@ export class Auth implements IAuth {
         if (!user.password.passwordMatches(dto.password)) {
             throw new UnauthorizedException('Email or password invalid', 401);
         }
-        const token = JWT.createToken(user, '1h');
+        const token = JWT.createToken('1h', user);
         return { token }
     }
 }
