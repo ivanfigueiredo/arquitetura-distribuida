@@ -11,9 +11,9 @@ export class RabbitMQAdapter implements Queue {
 		this.connection = await amqp.connect("amqp://rabbitmq:rabbitmq@rabbitMQ:5672");
 	}
 
-	async consume(queueName: string, callback: Function): Promise<void> {
+	async consume(queueName: string, exchange: string, routeKey: string, callback: Function): Promise<void> {
 		const channel = await this.connection.createChannel();
-		await channel.assertQueue(queueName, { durable: true });
+		await channel.bindQueue(queueName, exchange, routeKey);
 		channel.consume(queueName, async (msg: any) => {
 			this.context.setContext({
 				correlationId: msg.properties.headers.correlationId,
@@ -29,9 +29,8 @@ export class RabbitMQAdapter implements Queue {
 		});
 	}
 
-	async publish(queueName: string, data: any): Promise<void> {
+	async publish(exchange: string, routeKey: string, data: any, headers: { [key: string]: string }): Promise<void> {
 		const channel = await this.connection.createChannel();
-		await channel.assertQueue(queueName, { durable: true });
-		await channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)));
+		await channel.publish(exchange, routeKey, Buffer.from(JSON.stringify(data)), { headers })
 	}
 }
