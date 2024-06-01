@@ -5,6 +5,7 @@ export type Headers = {
 
 export interface ISpan {
     setContext(headers: Headers): void;
+    getHeaders(): Headers;
     startSpan(spanName: string): void;
     endSpan(): void;
 }

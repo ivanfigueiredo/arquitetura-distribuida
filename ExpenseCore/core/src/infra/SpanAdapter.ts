@@ -4,6 +4,7 @@ import { Headers, ISpan } from "./ISpan";
 export class SpanAdapter implements ISpan {
     private readonly SERVICE_NAME = "create.user.service";
     private readonly SERVICE_VERSION = "0.0.1";
+    private headers?: Headers;
     private tracer: Tracer;
     private context?: Context;
     private span?: Span;
@@ -13,6 +14,7 @@ export class SpanAdapter implements ISpan {
     }
 
     public setContext(headers: Headers): void {
+        this.headers = headers;
         const traceparent = headers!.traceparent.split("-");
         this.context = trace.setSpanContext(context.active(), {
             traceId: traceparent[1],
@@ -22,6 +24,10 @@ export class SpanAdapter implements ISpan {
         });
     }
 
+    public getHeaders(): Headers {
+        return this.headers!;
+    }
+
     public startSpan(spanName: string): void {
         this.span = this.tracer.startSpan(spanName, {}, this.context as Context);
     }
@@ -29,5 +35,5 @@ export class SpanAdapter implements ISpan {
     public endSpan(): void {
         this.span!.end();
     }
-    
+
 }
