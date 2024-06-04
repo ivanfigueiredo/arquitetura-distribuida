@@ -15,16 +15,16 @@ export class PostgresAdapter implements DatabaseConnection {
             password: 'postgres_user',
             database: 'user_database',
             synchronize: false,
-            entities: [UserEntity] 
+            entities: [UserEntity]
         });
     }
 
     async init(): Promise<void> {
         await this.connection.initialize()
-            .then(() => {})
-            .catch((error) => {console.log(`Error -->> ${error}`)})
+            .then(() => { })
+            .catch((error) => { console.log(`Error -->> ${error}`) })
     }
-    
+
     public getDataSourcer(): DataSource {
         return this.connection;
     }
