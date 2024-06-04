@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { DomainException } from './exception/DomainException';
 export class Password {
-    private constructor(readonly value: string) {}
+    private constructor(readonly value: string) { }
 
     private static isValid(value: string): boolean {
         const specialCharPattern = /.*[!@#\$%^&*(),.?\":{}|<>].*/;
@@ -16,11 +16,8 @@ export class Password {
     }
 
     public passwordMatches(password: string): boolean {
-        console.log('======================>>>>>>>>>> PASSWORD', password);
-        console.log('==========================>>>>>>>>>>>> VALUE', this.value);
         const passwordHash = createHash("sha1").update(password).digest("hex");
         const result = this.value === passwordHash;
-        console.log('============================>>>>>>>>>>>>>>> PASSWORD HASH', passwordHash);
         return result
     }
 
@@ -39,5 +36,5 @@ export class Password {
         return new Password(password);
     }
 
-    
+
 }
