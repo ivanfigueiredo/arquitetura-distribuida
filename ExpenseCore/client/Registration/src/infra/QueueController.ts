@@ -7,7 +7,7 @@ export default class QueueController {
         readonly queue: Queue,
         readonly clientRegistration: IClientRegistration
     ) {
-        queue.consume("client.registration.queue", async (input: any) => {
+        queue.consume("client.registration.queue", "", "", async (input: any) => {
             await clientRegistration.execute(input);
         });
     }
