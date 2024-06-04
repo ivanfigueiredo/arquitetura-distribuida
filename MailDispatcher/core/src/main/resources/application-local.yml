@@ -1,0 +1,6 @@
+rabbitMQ:
+  rabbitMQ_host: rabbitMQ
+  rabbitMQ_port: 5672
+  rabbitMQ_user: rabbitmq
+  rabbitMQ_password: rabbitmq
+  rabbitMQ_queue: "generate.email.confirmation.queue"

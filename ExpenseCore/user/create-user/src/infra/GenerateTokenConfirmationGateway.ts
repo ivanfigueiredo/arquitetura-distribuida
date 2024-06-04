@@ -6,7 +6,7 @@ export class GenerateTokenConfirmationGateway implements IGenerateTokenConfirmat
     constructor(private readonly context: ISpan) { }
 
     async generateToken(email: string): Promise<void> {
-        const url = 'http://localhost:6000/generate-email-confirmation-token'
+        const url = 'http://auth:6000/generate-email-confirmation-token'
         const headers = this.context.getHeaders();
         await axios.post(url, { email }, { headers })
     }

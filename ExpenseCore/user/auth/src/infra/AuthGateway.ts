@@ -9,11 +9,20 @@ export class AuthGateway implements IAuthGateway {
     ) { }
 
     async createUserNotification(data: Data): Promise<void> {
-        const url = 'http://localhost:8081/notification-email-confirmation';
+        const url = 'http://maildispatcher:8081/notification-email-confirmation';
+        const headers = this.context.getHeaders();
         try {
-            await axios.post(url, data, { headers: { 'Content-Type': 'application/json' } })
+            await axios.post(url, data,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'traceparent': headers.traceparent,
+                        'correlationid': headers.correlationId
+                    }
+                }
+            )
         } catch (error: any) {
-            const headers = this.context.getHeaders();
+            console.log('================>>>>>>> ERROR', error);
             const exchange = 'generate.email.confirmation.events';
             const routeKey = 'user.created';
             await this.queue.publish(exchange, routeKey, data, headers);

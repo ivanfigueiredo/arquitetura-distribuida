@@ -34,7 +34,7 @@ public class SpanAdapter implements IApplicationSpan, IUserSpan, ISpanAdapter {
 
     @Override
     public void startSpan(final String spanName, ICallback function) {
-        final var contextResult = this.makeContext(this.request, this.textMapPropagator);
+        final var contextResult = this.makeContext();
         final var span = tracer.spanBuilder(spanName)
                 .setParent(contextResult)
                 .setSpanKind(SpanKind.SERVER)
@@ -52,7 +52,7 @@ public class SpanAdapter implements IApplicationSpan, IUserSpan, ISpanAdapter {
     public MessageProperties contextPropagationQueue() {
         final var correlationId = this.request.getHeader("x-correlation-id");
         final var messageProperties = new MessageProperties();
-        final var context = this.makeContext(this.request, this.textMapPropagator);
+        final var context = this.makeContext();
         messageProperties.setHeader("correlationId", correlationId);
 
         this.textMapPropagator.inject(context, messageProperties.getHeaders(), (carrier, key, value) -> {
@@ -69,7 +69,7 @@ public class SpanAdapter implements IApplicationSpan, IUserSpan, ISpanAdapter {
         return interceptors;
     }
 
-    private Context makeContext(final HttpServletRequest request, final TextMapPropagator textMapPropagator) {
+    private Context makeContext() {
         return textMapPropagator.extract(Context.current(), request, new HeaderGetter());
     }
 
