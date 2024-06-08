@@ -4,5 +4,5 @@ export interface IAuthGateway {
 
 export interface Data {
     email: string;
-    token: string;
+    code: string;
 }
