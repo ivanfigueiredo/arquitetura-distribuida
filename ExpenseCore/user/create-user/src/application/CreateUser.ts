@@ -4,13 +4,13 @@ import { IUserRepository } from "./IUserRepository";
 import { ICreateUser, UserCreatedDto } from "./ICreateUser";
 import { CreateUserDto } from "./dto/CreateUserDto";
 import { InternalServerErrorException } from "../infra/exceptions/InternalServerErrorException";
-import { IGenerateTokenConfirmation } from "./IGenerateTokenConfirmationGateway";
+import { IGenerateCodeConfirmation } from "./IGenerateCodeConfirmationGateway";
 
 export class CreateUser implements ICreateUser {
     constructor(
         private readonly repository: IUserRepository,
         private readonly unitOfWork: IUnitOfWorkApplication,
-        private readonly generateTokenConfirmation: IGenerateTokenConfirmation
+        private readonly generateCodeConfirmation: IGenerateCodeConfirmation
     ) { }
 
     async execute(dto: CreateUserDto): Promise<UserCreatedDto> {
@@ -19,7 +19,7 @@ export class CreateUser implements ICreateUser {
             const user = User.create(dto.email, dto.password, dto.userType);
             await this.repository.save(user);
             await this.unitOfWork.commit();
-            await this.generateTokenConfirmation.generateToken(user.email);
+            await this.generateCodeConfirmation.generateCode(user.email);
             return { userId: user.userId };
         } catch (error) {
             if (error instanceof InternalServerErrorException) {

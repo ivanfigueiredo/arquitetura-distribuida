@@ -6,17 +6,19 @@ import { ExpressAdapter } from './infra/ExpressAdapter';
 import { MainController } from './infra/MainController';
 import { PostgresAdapter } from './infra/PostgresAdapter';
 import { UserDatabase } from './infra/UserDatabase';
-import { IGenerateEmailConfirmationToken } from './application/IGenerateEmailConfirmationToken';
+import { IGenerateEmailConfirmationCode } from './application/IGenerateEmailConfirmationCode';
 import { IAuthGateway } from './application/IAuthGateway';
 import { AuthGateway } from './infra/AuthGateway';
-import { GenerateEmailConfirmationToken } from './application/GenerateEmailConfirmationToken';
+import { GenerateEmailConfirmationCode } from './application/GenerateEmailConfirmationCode';
+import { CodeDatabase } from './infra/CodeDatabase';
 
 export class MainLayer {
     private expressAdapter?: ExpressAdapter;
     private databaseConnection: DatabaseConnection;
     private userDatabase?: UserDatabase;
+    private codeDatabase?: CodeDatabase;
     private auth?: IAuth;
-    private generateEmailConfirmationToken?: IGenerateEmailConfirmationToken;
+    private generateEmailConfirmationCode?: IGenerateEmailConfirmationCode;
     private authGateway?: IAuthGateway;
     public span?: SpanAdapter;
     public rabbitMQAdapter?: RabbitMQAdapter;
@@ -29,10 +31,11 @@ export class MainLayer {
         await this.databaseConnection.init();
         this.expressAdapter = new ExpressAdapter(this.span!);
         this.userDatabase = new UserDatabase(this.databaseConnection);
+        this.codeDatabase = new CodeDatabase(this.databaseConnection)
         this.auth = new Auth(this.userDatabase);
         this.authGateway = new AuthGateway(this.rabbitMQAdapter!, this.span!);
-        this.generateEmailConfirmationToken = new GenerateEmailConfirmationToken(this.authGateway);
-        new MainController(this.expressAdapter, this.auth!, this.generateEmailConfirmationToken!);
+        this.generateEmailConfirmationCode = new GenerateEmailConfirmationCode(this.codeDatabase, this.authGateway);
+        new MainController(this.expressAdapter, this.auth!, this.generateEmailConfirmationCode!);
         this.expressAdapter!.listen(6000, () => { console.log("Rodando na porta 6000") });
     }
 

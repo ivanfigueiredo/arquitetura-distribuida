@@ -3,6 +3,6 @@ export interface SignInDto {
     password: string;
 }
 
-export interface GenerateEmailConfirmationTokenDto {
+export interface GenerateEmailConfirmationCodeDto {
     email: string;
 }

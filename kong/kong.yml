@@ -6,7 +6,6 @@ services:
     host: default_upstream
     path: "/"
     protocol: "http"
-    # url: http://bus:8080/users/signup
     routes:
       - name: create_user_route
         paths:
@@ -22,6 +21,13 @@ services:
           - POST
         preserve_host: false
         strip_path: false
+      - name: user_activate
+        paths:
+          - /users/activate
+        methods:
+          - GET
+        preserve_host: false
+        strip_path: false
 
 
 plugins:
@@ -32,35 +38,37 @@ plugins:
       resource_attributes:
         service.name: api.gateway.user
   - name: rate-limiting
-    route: create_user_route
-    config:
-      minute: 10
-      limit_by: ip
-  - name: rate-limiting
-    route: auth_route
+    service: Users
     config:
       minute: 10
       limit_by: ip
   - name: cors
-    route: auth_route
-    config:
-      origins: ["*"]
-      methods: ["GET", "POST", "PUT", "DELETE"]
-      headers: ["Origin", "Content-Type"]
-  - name: cors
-    route: create_user_route
+    service: Users
     config:
       origins: ["*"]
       methods: ["GET", "POST", "PUT", "DELETE"]
       headers: ["Origin", "Content-Type"]
   - name: correlation-id
-    route: create_user_route
+    service: Users
     config:
       header_name: X-Correlation-ID
-  - name: correlation-id
-    route: auth_route
+  - name: request-transformer
+    route: user_activate
     config:
-      header_name: X-Correlation-ID
+      http_method: "POST"
+      add:
+        body:
+          - code:$(query_params.code)
+          - email:$(query_params.email)
+        headers:
+          - Content-Type:application/json
+  # - name: jwt
+  #   route: user_activate
+  #   enabled: true
+  #   config:
+  #     key_claim_name: kid
+  #     claims_to_verify:
+  #       - exp
 
 consumers:
   - username: loginservice

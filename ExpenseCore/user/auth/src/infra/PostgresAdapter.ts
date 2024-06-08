@@ -1,7 +1,8 @@
+import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { DatabaseConnection } from "./DatabaseConnection";
-import "reflect-metadata";
 import { UserEntity } from "./entities/UserEntity";
+import { VerificationCodeEntity } from "./entities/VerificationCodeEntity";
 
 export class PostgresAdapter implements DatabaseConnection {
     private connection: DataSource;
@@ -15,7 +16,7 @@ export class PostgresAdapter implements DatabaseConnection {
             password: 'postgres_user',
             database: 'user_database',
             synchronize: false,
-            entities: [UserEntity]
+            entities: [UserEntity, VerificationCodeEntity]
         });
     }
 

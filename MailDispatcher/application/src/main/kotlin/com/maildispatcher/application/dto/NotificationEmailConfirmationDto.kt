@@ -1,10 +1,10 @@
 package com.maildispatcher.application.dto
 
 data class NotificationEmailConfirmationDto(
-    val token: String,
+    val code: String,
     val email: String
 ) {
     override fun toString(): String {
-        return "GenerateEmailConfirmationTokenDto(token: $token, email: $email)"
+        return "GenerateEmailConfirmationTokenDto(token: $code, email: $email)"
     }
 }

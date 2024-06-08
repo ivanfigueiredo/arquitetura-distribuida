@@ -6,14 +6,14 @@ import { MainCoontroller } from './infra/MainController';
 import { UnitOfWork } from './infra/UnitOfWork';
 import { PostgresAdapter } from './infra/PostgresAdapter';
 import { DatabaseConnection } from './infra/DatabaseConnection';
-import { GenerateTokenConfirmationGateway } from './infra/GenerateTokenConfirmationGateway';
+import { GenerateCodeConfirmationGateway } from './infra/GenerateCodeConfirmationGateway';
 
 export class MainLayer {
     private expressAdapter?: ExpressAdapter;
     private databaseConnection: DatabaseConnection;
     private unitOfWork?: UnitOfWork;
     private userDatabase?: UserDatabase;
-    private generateTokenConfirmationGateway?: GenerateTokenConfirmationGateway;
+    private generateCodeConfirmationGateway?: GenerateCodeConfirmationGateway;
     private createUser?: CreateUser;
     public span?: SpanAdapter;
 
@@ -27,8 +27,8 @@ export class MainLayer {
         this.expressAdapter = new ExpressAdapter(this.span!);
         this.unitOfWork = new UnitOfWork(this.databaseConnection);
         this.userDatabase = new UserDatabase(this.unitOfWork);
-        this.generateTokenConfirmationGateway = new GenerateTokenConfirmationGateway(this.span!);
-        this.createUser = new CreateUser(this.userDatabase, this.unitOfWork, this.generateTokenConfirmationGateway!);
+        this.generateCodeConfirmationGateway = new GenerateCodeConfirmationGateway(this.span!);
+        this.createUser = new CreateUser(this.userDatabase, this.unitOfWork, this.generateCodeConfirmationGateway!);
         new MainCoontroller(this.expressAdapter, this.createUser!);
         this.expressAdapter!.listen(6001, () => { console.log("Rodando na porta 6001") });
     }

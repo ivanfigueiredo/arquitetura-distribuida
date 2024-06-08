@@ -21,7 +21,7 @@ public class UserServiceConfig {
 //    }
 
     @Bean
-    public IUserService createUserService(final CreateUserGateway createUserGateway, final SpanAdapter userSpan) {
-        return new UserService(createUserGateway, userSpan);
+    public IUserService createUserService(final CreateUserGateway createUserGateway) {
+        return new UserService(createUserGateway);
     }
 }
