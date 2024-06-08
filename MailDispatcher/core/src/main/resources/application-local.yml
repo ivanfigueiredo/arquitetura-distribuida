@@ -4,3 +4,9 @@ rabbitMQ:
   rabbitMQ_user: rabbitmq
   rabbitMQ_password: rabbitmq
   rabbitMQ_queue: "generate.email.confirmation.queue"
+
+mail_sender:
+  host: smtp.gmail.com
+  port: 587
+  username: "expense.master.suporte@gmail.com"
+  password: "buychgyfivqavidv"
