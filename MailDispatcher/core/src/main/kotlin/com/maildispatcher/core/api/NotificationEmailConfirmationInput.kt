@@ -5,9 +5,9 @@ import com.maildispatcher.application.dto.NotificationEmailConfirmationDto
 
 data class NotificationEmailConfirmationInput(
     val email: String,
-    val token: String
+    val code: String
 ) {
     fun toNotificationEmailConfirmationDto(): NotificationEmailConfirmationDto {
-        return NotificationEmailConfirmationDto(token, email)
+        return NotificationEmailConfirmationDto(code, email)
     }
 }
