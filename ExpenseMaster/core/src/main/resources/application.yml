@@ -22,3 +22,5 @@ user:
     hostname: http://auth:6000
   create-user:
     hostname: http://user_create:6001
+  confirmation-email:
+    hostname: http://confirmation-email:6002

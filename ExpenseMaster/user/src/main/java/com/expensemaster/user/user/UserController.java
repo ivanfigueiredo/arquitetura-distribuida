@@ -4,7 +4,9 @@ import com.expensemaster.application.user.IUserService;
 import com.expensemaster.application.user.UserCreatedDto;
 import com.expensemaster.application.user.dto.CreateUserDto;
 import com.expensemaster.user.IUserSpan;
+import com.expensemaster.user.template.Template;
 import com.expensemaster.user.user.input.CreateUserInput;
+import com.expensemaster.user.user.input.UserConfirmationEmailInput;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +39,15 @@ public class UserController implements IUserAPI {
         });
 
         return new ResponseEntity<>(output.get(), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> activate(final HttpServletRequest request, final UserConfirmationEmailInput input) {
+        this.userSpan.setHttpRequest(request);
+        final var dto = input.toDto();
+        this.userSpan.startSpan("userController.confirmation.email", () -> {
+            userService.confirmationEmail(dto);
+        });
+        return new ResponseEntity<>(Template.confirmedEmail(), HttpStatus.OK);
     }
 }

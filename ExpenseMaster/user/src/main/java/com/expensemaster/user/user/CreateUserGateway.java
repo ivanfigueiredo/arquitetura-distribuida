@@ -2,6 +2,7 @@ package com.expensemaster.user.user;
 
 import com.expensemaster.application.user.ICreateUserGateway;
 import com.expensemaster.application.user.UserCreatedDto;
+import com.expensemaster.application.user.dto.ConfirmationEmailDto;
 import com.expensemaster.application.user.dto.CreateUserDto;
 import com.expensemaster.user.IUserSpan;
 import com.expensemaster.user.exceptions.InternalServerErrorException;
@@ -17,7 +18,10 @@ import java.util.Objects;
 public class CreateUserGateway implements ICreateUserGateway {
 
     @Value("${user.create-user.hostname}")
-    private String hostname;
+    private String createUserHost;
+
+    @Value("${user.confirmation-email.hostname}")
+    private String confirmationEmailHost;
 
     private final RestTemplate restTemplate;
     private final IUserSpan userSpan;
@@ -32,14 +36,25 @@ public class CreateUserGateway implements ICreateUserGateway {
         try {
             final var interceptors = this.userSpan.contextPropagationApi();
             restTemplate.setInterceptors(interceptors);
-            return this.restTemplate.postForObject(this.hostname + "/create-user", dto, UserCreatedDto.class);
+            return this.restTemplate.postForObject(this.createUserHost + "/create-user", dto, UserCreatedDto.class);
         } catch (RestClientException e) {
-            System.out.println("========================>>>>>>>> CREATE" + e.getMessage());
             final var error = "A senha não é válida. Ela deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um dígito e um caractere especial.";
             if (e.getMessage().contains(error)) {
                 throw new UnprocessableEntityException(error);
             }
             throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void confirmationEmail(ConfirmationEmailDto dto) {
+        try {
+            final var interceptors = this.userSpan.contextPropagationApi();
+            restTemplate.setInterceptors(interceptors);
+            this.restTemplate.postForLocation(this.confirmationEmailHost + "/verify", dto);
+        } catch (RestClientException e) {
+            System.out.println("===> ERROR" + e.getMessage());
+            throw new InternalServerErrorException("Internal server error. If the error persists, contact support");
         }
     }
 }
