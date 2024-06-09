@@ -98,6 +98,20 @@ services:
       - opentelemetry-collector
       - flyway_db_user
 
+  confirmation_email:
+    container_name: confirmation_email
+    restart: always
+    build:
+      context: ./ExpenseCore
+      dockerfile: Dockerfile_confirmation_email
+    networks:
+      - expense
+      - user
+    depends_on:
+      - user_db
+      - opentelemetry-collector
+      - flyway_db_user
+
   client_registration:
     container_name: client_registration
     restart: always
