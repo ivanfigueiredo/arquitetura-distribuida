@@ -25,7 +25,7 @@ export class MainLayer {
         this.expressAdapter = new ExpressAdapter(this.span!);
         this.unitOfWork = new UnitOfWork(this.databaseConnection);
         this.userDatabase = new UserDatabase(this.unitOfWork);
-        this.confirmationEmail = new ConfirmationEmail(this.userDatabase!);
+        this.confirmationEmail = new ConfirmationEmail(this.userDatabase!, this.unitOfWork!);
         new MainCoontroller(this.expressAdapter, this.confirmationEmail!);
         this.expressAdapter!.listen(6002, () => { console.log("Rodando na porta 6002") });
     }
