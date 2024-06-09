@@ -17,8 +17,11 @@ CREATE TABLE "user" (
 
 CREATE TABLE "verification_code" (
     code_id VARCHAR(36) NOT NULL PRIMARY KEY,
-    email_verify VARCHAR(255) NOT NULL UNIQUE,
+    email_verify VARCHAR(255) NOT NULL,
     code VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    expiration_time TIMESTAMP
+    expiration_time TIMESTAMP,
+
+
+    CONSTRAINT fk_email_verify FOREIGN KEY (email_verify) REFERENCES "user" (email)
 );

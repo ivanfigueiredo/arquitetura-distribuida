@@ -1,11 +1,9 @@
 package com.expensemaster.application.user;
 
-import com.expensemaster.application.IApplicationSpan;
 import com.expensemaster.application.user.dto.ConfirmationEmailDto;
 import com.expensemaster.application.user.dto.CreateUserDto;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class UserService implements IUserService {
     private final ICreateUserGateway createUserGateway;
