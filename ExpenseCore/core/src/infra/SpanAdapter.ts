@@ -1,4 +1,4 @@
-import { trace, context, Context, Tracer, Span } from '@opentelemetry/api';
+import { trace, context, Context, Tracer, Span, SpanKind } from '@opentelemetry/api';
 import { Headers, ISpan } from "./ISpan";
 
 export class SpanAdapter implements ISpan {
@@ -29,11 +29,11 @@ export class SpanAdapter implements ISpan {
     }
 
     public startSpan(spanName: string): void {
-        this.span = this.tracer.startSpan(spanName, {}, this.context as Context);
+        this.span = this.tracer.startSpan(spanName, { kind: SpanKind.SERVER, startTime: new Date() }, this.context as Context);
     }
 
     public endSpan(): void {
-        this.span!.end();
+        this.span!.end(new Date());
     }
 
 }

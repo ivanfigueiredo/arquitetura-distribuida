@@ -1,18 +1,38 @@
 receivers:
   otlp:
     protocols:
-      http: 
+      http:
+      grpc:
+
+processors:
+  batch:
 
 exporters:
   logging:
-    verbosity: Detailed
+    loglevel: debug
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
   zipkin:
     endpoint: "http://zipkin:9411/api/v2/spans"
     tls:
      insecure: true
+  otlp:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+extensions:
+  health_check:
+  pprof:
+  zpages:
 
 service:
+  extensions: [health_check, pprof, zpages]
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [zipkin]
+      processors: [batch]
+      exporters: [zipkin,otlp]
+    logs:
+      receivers: [otlp]
+      exporters: [loki]

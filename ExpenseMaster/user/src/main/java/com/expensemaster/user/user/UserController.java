@@ -8,6 +8,8 @@ import com.expensemaster.user.template.Template;
 import com.expensemaster.user.user.input.CreateUserInput;
 import com.expensemaster.user.user.input.UserConfirmationEmailInput;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +19,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 public class UserController implements IUserAPI {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     private final IUserService userService;
 
     private final IUserSpan userSpan;
@@ -35,9 +40,10 @@ public class UserController implements IUserAPI {
         final var dto = new CreateUserDto(input.email(), input.password(), input.userType());
         AtomicReference<UserCreatedDto> output = new AtomicReference<UserCreatedDto>();
         this.userSpan.startSpan("userController.create.user", () -> {
-           output.set(userService.createUser(dto));
+            logger.info("Recebendo requisição HTTP para criação de usuário");
+            output.set(userService.createUser(dto));
+            logger.info("Usuário criado com sucesso");
         });
-
         return new ResponseEntity<>(output.get(), HttpStatus.OK);
     }
 

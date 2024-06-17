@@ -16,6 +16,7 @@ expense:
   master:
     otlp:
       tracing-server: "http://opentelemetry-collector:4318/v1/traces"
+      log-server: "http://opentelemetry-collector:4317"
 
 user:
   auth:
