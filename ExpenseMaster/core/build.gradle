@@ -34,8 +34,14 @@ dependencies {
     implementation('io.opentelemetry:opentelemetry-exporter-otlp:1.36.0')
     implementation("io.opentelemetry:opentelemetry-api");
     implementation("io.opentelemetry:opentelemetry-sdk");
-    implementation("io.opentelemetry:opentelemetry-exporter-logging");
+    implementation("io.opentelemetry:opentelemetry-exporter-logging")
     implementation("io.opentelemetry.semconv:opentelemetry-semconv:1.25.0-alpha");
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6'
+    implementation('ch.qos.logback:logback-classic:1.5.6')
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:1.29.0-alpha'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0'
+    runtimeOnly group: 'io.opentelemetry.instrumentation', name: 'opentelemetry-logback-mdc-1.0', version: '2.4.0-alpha'
+
 }
 
 test {
