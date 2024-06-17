@@ -43,18 +43,67 @@ services:
     restart: always
     depends_on:
       - zipkin
+      - tempo
     image: otel/opentelemetry-collector-contrib:0.99.0
     ports:
       - "1888:1888"
       - "8888:8888"
       - "8889:8889"
       - "13133:13133"
-      - "4317:4317"
-      - "4318:4318"
       - "55679:55679"
     volumes:
       - ./volumes/otel/otelcol.yaml:/etc/otel-collector-config.yaml
     command: --config=/etc/otel-collector-config.yaml
+    networks:
+      - expense
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - tempo
+    volumes:
+      - ./volumes/grafana/grafana.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    networks:
+      - expense
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    restart: always
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./volumes/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - expense
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    ports:
+      - "3200:3200" # HTTP API
+      - "4318:4318" # otlp http
+    volumes:
+      - tempo-data:/var/lib/tempo
+      - ./volumes/tempo/tempo-local.yml:/etc/tempo/tempo-local.yml
+    networks:
+      - expense
+    command:
+      - --config.file=/etc/tempo/tempo-local.yml
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    container_name: loki
+    ports:
+      - "3100:3100"
     networks:
       - expense
 
@@ -238,7 +287,9 @@ services:
       - 5434:5432
 
 volumes:
+  grafana-data:
   rabbitmq-data:
+  tempo-data:
 
 networks:
   user:
