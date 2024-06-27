@@ -31,12 +31,10 @@ services:
 
 
 plugins:
-  - name: opentelemetry
+  - name: file-log
     service: Users
-    config:
-      endpoint: http://opentelemetry-collector:4318/v1/traces
-      resource_attributes:
-        service.name: api.gateway.user
+    config:  
+      path: /var/log/kong/kong.log  
   - name: rate-limiting
     service: Users
     config:
@@ -48,10 +46,6 @@ plugins:
       origins: ["*"]
       methods: ["GET", "POST", "PUT", "DELETE"]
       headers: ["Origin", "Content-Type"]
-  - name: correlation-id
-    service: Users
-    config:
-      header_name: X-Correlation-ID
   - name: request-transformer
     route: user_activate
     config:
@@ -62,6 +56,20 @@ plugins:
           - email:$(query_params.email)
         headers:
           - Content-Type:application/json
+  - name: opentelemetry
+    service: Users
+    config:
+      endpoint: http://opentelemetry-collector:4318/v1/traces
+      resource_attributes:
+        service.name: api.gateway.user
+      propagation:
+        extract: [w3c]
+        inject: [preserve]
+        default_format: "w3c"
+      connect_timeout: 5000
+      send_timeout: 9000
+      read_timeout: 9000
+    
   # - name: jwt
   #   route: user_activate
   #   enabled: true
