@@ -1,4 +1,4 @@
-import { ExpenseCoreMain, SpanAdapter } from 'expense-core';
+import { ExpenseCoreMain, ILogger, ILoggerContext, SpanAdapter } from 'expense-core';
 import { CreateUser } from './application/CreateUser';
 import { UserDatabase } from './infra/UserDatabase';
 import { ExpressAdapter } from './infra/ExpressAdapter';
@@ -16,6 +16,8 @@ export class MainLayer {
     private generateCodeConfirmationGateway?: GenerateCodeConfirmationGateway;
     private createUser?: CreateUser;
     public span?: SpanAdapter;
+    public logger?: ILogger;
+    public loggerContext?: ILoggerContext;
 
 
     constructor() {
@@ -24,11 +26,16 @@ export class MainLayer {
 
     async init(): Promise<void> {
         await this.databaseConnection!.init();
-        this.expressAdapter = new ExpressAdapter(this.span!);
+        this.expressAdapter = new ExpressAdapter(this.span!, this.loggerContext!);
         this.unitOfWork = new UnitOfWork(this.databaseConnection);
         this.userDatabase = new UserDatabase(this.unitOfWork);
         this.generateCodeConfirmationGateway = new GenerateCodeConfirmationGateway(this.span!);
-        this.createUser = new CreateUser(this.userDatabase, this.unitOfWork, this.generateCodeConfirmationGateway!);
+        this.createUser = new CreateUser(
+            this.userDatabase,
+            this.unitOfWork,
+            this.generateCodeConfirmationGateway!,
+            this.logger!
+        );
         new MainCoontroller(this.expressAdapter, this.createUser!);
         this.expressAdapter!.listen(6001, () => { console.log("Rodando na porta 6001") });
     }
@@ -36,7 +43,7 @@ export class MainLayer {
 }
 
 const main = new MainLayer();
-const core = new ExpenseCoreMain("create.user.service", "create.user");
+const core = new ExpenseCoreMain("Expense_Core", "command.create.user");
 (async () => {
     await core.initialize(main);
 })()
