@@ -4,6 +4,18 @@ receivers:
       http:
       grpc:
 
+connectors:
+  servicegraph:
+    dimensions:
+      - db.system
+      - messaging.system
+    virtual_node_peer_attributes:
+      - db.name
+      - db.system
+      - messaging.system
+      - peer.service
+
+
 processors:
   batch:
 
@@ -12,11 +24,10 @@ exporters:
     loglevel: debug
   loki:
     endpoint: "http://loki:3100/loki/api/v1/push"
-  zipkin:
-    endpoint: "http://zipkin:9411/api/v2/spans"
-    tls:
-     insecure: true
-  otlp:
+  prometheus/servicegraph:
+    endpoint: localhost:9090
+    namespace: servicegraph
+  otlp/tempo:
     endpoint: tempo:4317
     tls:
       insecure: true
@@ -29,10 +40,13 @@ extensions:
 service:
   extensions: [health_check, pprof, zpages]
   pipelines:
+    metrics/servicegraph:
+      receivers: [servicegraph]
+      exporters: [prometheus/servicegraph,logging]
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [zipkin,otlp]
+      exporters: [otlp/tempo,servicegraph,logging]
     logs:
       receivers: [otlp]
       exporters: [loki]
