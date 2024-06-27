@@ -12,6 +12,8 @@ public interface IUserSpan {
 
     public void startSpan(final String spanName, ICallback function);
 
+    public void startSpanWithContext(final String spanName, ICallback function);
+
     public MessageProperties contextPropagationQueue();
 
     public List<ClientHttpRequestInterceptor> contextPropagationApi();

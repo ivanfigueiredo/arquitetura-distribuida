@@ -4,6 +4,7 @@ import com.expensemaster.application.user.Queue.ICommand;
 import com.expensemaster.core.ISpanAdapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.opentelemetry.api.trace.SpanKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -37,7 +38,7 @@ public class Command implements ICommand {
             rabbitTemplate.setExchange(exchange);
             rabbitTemplate.setRoutingKey(routingKey);
             final var message = new Message(payload.getBytes(), context);
-            spanAdapter.startSpan("producer.create.user.event", () -> rabbitTemplate.convertAndSend(message));
+            spanAdapter.startSpanWithContext("producer.create.user.event", () -> rabbitTemplate.convertAndSend(message));
             logger.info("Evento publicado com sucesso");
         } catch (JsonProcessingException e) {
             logger.error(e.getMessage(), e);
