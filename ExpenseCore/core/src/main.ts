@@ -2,6 +2,7 @@ import { RabbitMQAdapter } from './infra/Queue/RabbitMQAdapter';
 import { OpenTelemetrySDK } from './infra/OpenTelemetrySDK';
 import { SpanAdapter } from './infra/SpanAdapter';
 import { ISpan } from './infra/ISpan';
+import { ExpenserLogger } from './infra/ExpenseLogger';
 
 export class ExpenseCoreMain {
     private rabbitMQAdapter?: RabbitMQAdapter;
@@ -15,12 +16,15 @@ export class ExpenseCoreMain {
     }
 
     public async initialize(serviceInstance: any): Promise<void> {
-        new OpenTelemetrySDK(this.serviceName, this.command);
-        this.spanAdapter = new SpanAdapter();
+        const openTelemetrySdk = new OpenTelemetrySDK(this.serviceName, this.command);
+        const expenseLogger = new ExpenserLogger(openTelemetrySdk.getLoggerProvider, this.serviceName);
+        this.spanAdapter = new SpanAdapter(this.serviceName, '0.0.1');
         this.rabbitMQAdapter = new RabbitMQAdapter(this.spanAdapter);
         await this.rabbitMQAdapter.connect();
         serviceInstance.rabbitMQAdapter = this.rabbitMQAdapter;
         serviceInstance.span = this.spanAdapter;
+        serviceInstance.logger = expenseLogger;
+        serviceInstance.loggerContext = expenseLogger;
         await serviceInstance.init();
     }
 }
