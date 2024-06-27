@@ -13,10 +13,6 @@ services:
       KONG_LOG_LEVEL: debug
       KONG_TRACING_INSTRUMENTATIONS: all
       KONG_TRACING_SAMPLING_RATE: 1.0
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
       # KONG_ADMIN_GUI_URL: http://localhost:8002
 
@@ -31,6 +27,7 @@ services:
       retries: 3
     volumes:
       - ./kong/kong.yml:/kong/declarative/kong.yml
+      - ./logs/kong:/var/log/kong
     ports:
       - "8004:8000"
       - "8443:8443"
@@ -42,9 +39,8 @@ services:
     container_name: opentelemetry-collector
     restart: always
     depends_on:
-      - zipkin
       - tempo
-    image: otel/opentelemetry-collector-contrib:0.99.0
+    image: otel/opentelemetry-collector-contrib
     ports:
       - "1888:1888"
       - "8888:8888"
@@ -53,6 +49,7 @@ services:
       - "55679:55679"
     volumes:
       - ./volumes/otel/otelcol.yaml:/etc/otel-collector-config.yaml
+      - ./logs/kong:/var/log/kong
     command: --config=/etc/otel-collector-config.yaml
     networks:
       - expense
@@ -107,14 +104,6 @@ services:
     networks:
       - expense
 
-  zipkin:
-    container_name: zipkin
-    image: openzipkin/zipkin:latest
-    ports:
-      - "9411:9411"
-    networks:
-      - expense
-
   queue:
     container_name: rabbitMQ
     image: rabbitmq:3-management
@@ -147,34 +136,34 @@ services:
       - opentelemetry-collector
       - flyway_db_user
 
-  confirmation_email:
-    container_name: confirmation_email
-    restart: always
-    build:
-      context: ./ExpenseCore
-      dockerfile: Dockerfile_confirmation_email
-    networks:
-      - expense
-      - user
-    depends_on:
-      - user_db
-      - opentelemetry-collector
-      - flyway_db_user
+  # confirmation_email:
+  #   container_name: confirmation_email
+  #   restart: always
+  #   build:
+  #     context: ./ExpenseCore
+  #     dockerfile: Dockerfile_confirmation_email
+  #   networks:
+  #     - expense
+  #     - user
+  #   depends_on:
+  #     - user_db
+  #     - opentelemetry-collector
+  #     - flyway_db_user
 
-  client_registration:
-    container_name: client_registration
-    restart: always
-    build:
-      context: ./ExpenseCore
-      dockerfile: Dockerfile_client_registration
-    networks:
-      - expense
-      - client
-    depends_on:
-      - queue
-      - client_db
-      - opentelemetry-collector
-      - flyway_db_client
+  # client_registration:
+  #   container_name: client_registration
+  #   restart: always
+  #   build:
+  #     context: ./ExpenseCore
+  #     dockerfile: Dockerfile_client_registration
+  #   networks:
+  #     - expense
+  #     - client
+  #   depends_on:
+  #     - queue
+  #     - client_db
+  #     - opentelemetry-collector
+  #     - flyway_db_client
 
   auth:
     build:
@@ -217,28 +206,28 @@ services:
       - queue
       - opentelemetry-collector
 
-  flyway_db_client:
-    image: flyway/flyway
-    container_name: flyway_db_client
-    volumes:
-      - ./volumes/flyway/client_db:/flyway/sql
-    command: -url=jdbc:postgresql://client_db:5432/client_database -user=postgres_client -password=postgres_client migrate
-    depends_on:
-      - client_db
-    networks:
-      - client
+  # flyway_db_client:
+  #   image: flyway/flyway
+  #   container_name: flyway_db_client
+  #   volumes:
+  #     - ./volumes/flyway/client_db:/flyway/sql
+  #   command: -url=jdbc:postgresql://client_db:5432/client_database -user=postgres_client -password=postgres_client migrate
+  #   depends_on:
+  #     - client_db
+  #   networks:
+  #     - client
 
-  client_db:
-    image: postgres:latest
-    container_name: client_db
-    environment:
-      POSTGRES_USER: postgres_client
-      POSTGRES_PASSWORD: postgres_client
-      POSTGRES_DB: client_database
-    networks:
-      - client
-    ports:
-      - 5432:5432
+  # client_db:
+  #   image: postgres:latest
+  #   container_name: client_db
+  #   environment:
+  #     POSTGRES_USER: postgres_client
+  #     POSTGRES_PASSWORD: postgres_client
+  #     POSTGRES_DB: client_database
+  #   networks:
+  #     - client
+  #   ports:
+  #     - 5432:5432
 
   # flyway_db_account:
   #   image: flyway/flyway
