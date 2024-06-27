@@ -40,7 +40,6 @@ dependencies {
     implementation('ch.qos.logback:logback-classic:1.5.6')
     implementation 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:1.29.0-alpha'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0'
-    runtimeOnly group: 'io.opentelemetry.instrumentation', name: 'opentelemetry-logback-mdc-1.0', version: '2.4.0-alpha'
 
 }
 
