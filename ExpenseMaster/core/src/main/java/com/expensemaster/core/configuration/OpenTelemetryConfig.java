@@ -7,15 +7,15 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.exporter.logging.LoggingMetricExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter;
 import io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.logs.SdkLoggerProvider;
 import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
-import io.opentelemetry.exporter.logging.SystemOutLogRecordExporter;
-import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessorBuilder;
-import io.opentelemetry.sdk.logs.export.SimpleLogRecordProcessor;
+import io.opentelemetry.sdk.metrics.SdkMeterProvider;
+import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
@@ -23,8 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.UUID;
-import java.util.logging.LogRecord;
+import java.time.Duration;
 
 @Configuration
 public class OpenTelemetryConfig {
@@ -36,10 +35,10 @@ public class OpenTelemetryConfig {
 
     private static final String SERVICE_NAME = "service.name";
     private static final String SERVICE_VERSION = "version";
-    private static final String SERVICE_NAME_VALUE = "Expense_Master";
+    private static final String SERVICE_NAME_VALUE = "Expense_Core";
     private static final String PROCESS_PID = "Process.PID";
     private static final String PROCESS_PID_VALUE = String.valueOf(ProcessHandle.current().pid());
-    private static final String SERVICE_VERSION_VALUE = "0.1.0";
+    private static final String SERVICE_VERSION_VALUE = "0.0.1";
 
     @Bean
     public OpenTelemetry openTelemetry() {
@@ -51,6 +50,13 @@ public class OpenTelemetryConfig {
                         .build()
                 ));
 
+        SdkMeterProvider sdkMeterProvider = SdkMeterProvider.builder()
+                .registerMetricReader(
+                        PeriodicMetricReader
+                                .builder(LoggingMetricExporter.create())
+                                .setInterval(Duration.ofSeconds(60)).build())
+                .setResource(resource)
+                .build();
 
 
         SdkLoggerProvider sdkLoggerProvider = SdkLoggerProvider.builder()
@@ -65,6 +71,7 @@ public class OpenTelemetryConfig {
 
         final var openTelemetrySdk = OpenTelemetrySdk.builder()
                 .setTracerProvider(sdkTracerProvider)
+                .setMeterProvider(sdkMeterProvider)
                 .setLoggerProvider(sdkLoggerProvider)
                 .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
                 .buildAndRegisterGlobal();

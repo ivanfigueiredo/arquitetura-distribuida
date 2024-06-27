@@ -1,11 +1,15 @@
+import { Span } from "@opentelemetry/api";
+
 export type Headers = {
     traceparent: string;
-    correlationId: string;
 };
 
 export interface ISpan {
     setContext(headers: Headers): void;
-    getHeaders(): Headers;
-    startSpan(spanName: string): void;
-    endSpan(): void;
+    startSpanWithoutContext(spanName: string): void;
+    startSpanWithContext(spanName: string): void;
+    endSpanWithoutContext(): void;
+    endSpanWithContext(): void;
+    contextPropagationWith(): Record<string, string>;
+    getSpanServer(): Span;
 }

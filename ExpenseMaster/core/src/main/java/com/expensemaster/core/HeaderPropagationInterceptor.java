@@ -1,31 +1,30 @@
 package com.expensemaster.core;
 
 import com.expensemaster.user.exceptions.InternalServerErrorException;
-import jakarta.servlet.http.HttpServletRequest;
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.propagation.TextMapSetter;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.lang.NonNull;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 public class HeaderPropagationInterceptor implements ClientHttpRequestInterceptor {
-    private final HttpServletRequest httpServletRequest;
 
-    public HeaderPropagationInterceptor(final HttpServletRequest httpServletRequest) {
-        this.httpServletRequest = Objects.requireNonNull(httpServletRequest);
-    }
+    public HeaderPropagationInterceptor() {}
+
+    private static final TextMapSetter<HttpRequest> setter = (carrier, key, value) -> {
+        if (carrier != null) {
+            carrier.getHeaders().set(key, value);
+        }
+    };
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) {
-        final var traceparent = httpServletRequest.getHeader("traceparent");
-        final var correlationId = httpServletRequest.getHeader("x-correlation-id");
-        request.getHeaders().add("traceparent", traceparent);
-        request.getHeaders().add("correlationId", correlationId);
-
+        Context currentContext = Context.current();
+        W3CTraceContextPropagator.getInstance().inject(currentContext, request, setter);
         try {
             return execution.execute(request, body);
         } catch (IOException e) {

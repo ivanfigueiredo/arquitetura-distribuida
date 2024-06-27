@@ -39,10 +39,9 @@ public class UserController implements IUserAPI {
         this.userSpan.setHttpRequest(request);
         final var dto = new CreateUserDto(input.email(), input.password(), input.userType());
         AtomicReference<UserCreatedDto> output = new AtomicReference<UserCreatedDto>();
-        this.userSpan.startSpan("userController.create.user", () -> {
+        this.userSpan.startSpan("receive.from.kong", () -> {
             logger.info("Recebendo requisição HTTP para criação de usuário");
             output.set(userService.createUser(dto));
-            logger.info("Usuário criado com sucesso");
         });
         return new ResponseEntity<>(output.get(), HttpStatus.OK);
     }
@@ -51,7 +50,7 @@ public class UserController implements IUserAPI {
     public ResponseEntity<String> activate(final HttpServletRequest request, final UserConfirmationEmailInput input) {
         this.userSpan.setHttpRequest(request);
         final var dto = input.toDto();
-        this.userSpan.startSpan("userController.confirmation.email", () -> {
+        this.userSpan.startSpan("receive.from.kong", () -> {
             userService.confirmationEmail(dto);
         });
         return new ResponseEntity<>(Template.confirmedEmail(), HttpStatus.OK);

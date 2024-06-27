@@ -6,12 +6,13 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ISpanAdapter {
     public void setHttpRequest(final HttpServletRequest request);
 
     public void startSpan(final String spanName, ICallback function);
+
+    public void startSpanWithContext(final String spanName, ICallback function);
 
     public MessageProperties contextPropagationQueue();
 

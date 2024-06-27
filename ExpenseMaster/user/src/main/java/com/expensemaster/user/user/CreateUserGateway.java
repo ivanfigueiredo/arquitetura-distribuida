@@ -15,6 +15,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class CreateUserGateway implements ICreateUserGateway {
@@ -39,7 +40,11 @@ public class CreateUserGateway implements ICreateUserGateway {
         try {
             final var interceptors = this.userSpan.contextPropagationApi();
             restTemplate.setInterceptors(interceptors);
-            return this.restTemplate.postForObject(this.createUserHost + "/create-user", dto, UserCreatedDto.class);
+            AtomicReference<UserCreatedDto> output = new AtomicReference<UserCreatedDto>();
+            this.userSpan.startSpanWithContext("call.create.user.service", () -> {
+                output.set(this.restTemplate.postForObject(this.createUserHost + "/create-user", dto, UserCreatedDto.class));
+            });
+            return output.get();
         } catch (RestClientException e) {
             LOGGER.error(e.getMessage(), e);
             final var error = "A senha não é válida. Ela deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um dígito e um caractere especial.";
@@ -58,7 +63,6 @@ public class CreateUserGateway implements ICreateUserGateway {
             this.restTemplate.postForLocation(this.confirmationEmailHost + "/verify", dto);
         } catch (RestClientException e) {
             LOGGER.error(e.getMessage(), e);
-            System.out.println("===> ERROR" + e.getMessage());
             throw new InternalServerErrorException("Internal server error. If the error persists, contact support");
         }
     }

@@ -16,7 +16,6 @@ export class RabbitMQAdapter implements Queue {
 		await channel.bindQueue(queueName, exchange, routeKey);
 		channel.consume(queueName, async (msg: any) => {
 			this.context.setContext({
-				correlationId: msg.properties.headers.correlationId,
 				traceparent: msg.properties.headers.traceparent
 			});
 			const input = JSON.parse(msg.content.toString());

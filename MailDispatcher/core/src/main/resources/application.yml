@@ -17,6 +17,7 @@ mail:
   dispatcher:
     otlp:
       tracing-server: "http://opentelemetry-collector:4318/v1/traces"
+      log-server: "http://opentelemetry-collector:4317"
   sender:
     host: ${mail_sender.host}
     port: ${mail_sender.port}

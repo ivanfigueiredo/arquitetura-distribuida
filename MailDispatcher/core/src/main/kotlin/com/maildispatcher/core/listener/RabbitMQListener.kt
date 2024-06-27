@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.maildispatcher.application.NotificationEmailConfirmation
 import com.maildispatcher.application.dto.NotificationEmailConfirmationDto
 import com.maildispatcher.core.ISpan
+import io.opentelemetry.api.trace.SpanKind
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.messaging.handler.annotation.Payload
@@ -19,7 +20,7 @@ class RabbitMQListener(
         val mapper = jacksonObjectMapper()
         val result = mapper.readValue<NotificationEmailConfirmationDto>(message.body, NotificationEmailConfirmationDto::class.java)
         span.setHeaders(message.messageProperties.headers)
-        span.startSpan("notification.email.confirmation.queue") {
+        span.startSpan("notification.email.confirmation.queue", SpanKind.SERVER) {
             notificationEmailConfirmation.execute(result)
         }
     }

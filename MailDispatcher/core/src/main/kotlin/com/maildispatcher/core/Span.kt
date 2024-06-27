@@ -1,5 +1,6 @@
 package com.maildispatcher.core
 
+import io.opentelemetry.api.logs.LogRecordBuilder
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.Tracer
 import io.opentelemetry.context.Context
@@ -8,7 +9,11 @@ import org.springframework.stereotype.Component
 import java.time.Instant
 
 @Component
-class Span(private var tracer: Tracer, private var textMapPropagator: TextMapPropagator) : ISpan {
+class Span(
+    private var tracer: Tracer,
+    private var textMapPropagator: TextMapPropagator,
+    private val logRecordBuilder: LogRecordBuilder
+) : ISpan {
     private lateinit var headers: Map<String, Any>
 
     override fun setHeaders(headers: Map<String, Any>) {
@@ -22,14 +27,15 @@ class Span(private var tracer: Tracer, private var textMapPropagator: TextMapPro
     }
 
 
-    override fun startSpan(spanName: String, function: ICallback) {
+    override fun startSpan(spanName: String,  kind: SpanKind, function: ICallback) {
         val context = makeContext()
         val span = tracer.spanBuilder(spanName)
             .setParent(context)
-            .setSpanKind(SpanKind.SERVER)
+            .setSpanKind(kind)
             .startSpan()
         try {
             span.makeCurrent().use {
+                logRecordBuilder.setContext(context).emit()
                 function.apply()
             }
         } catch (e: Exception) {

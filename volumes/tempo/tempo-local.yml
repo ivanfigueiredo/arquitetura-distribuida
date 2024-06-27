@@ -25,6 +25,9 @@ metrics_generator:
     remote_write:
       - url: http://prometheus:9090/api/v1/write
         send_exemplars: true
+  processor:
+    service_graphs:
+      enable_virtual_node_label: true
 
 storage:
   trace:
@@ -37,4 +40,4 @@ storage:
 overrides:
   defaults:
     metrics_generator:
-      processors: [service-graphs, span-metrics]
+      processors: [span-metrics]

@@ -7,7 +7,9 @@ export class GenerateCodeConfirmationGateway implements IGenerateCodeConfirmatio
 
     async generateCode(email: string): Promise<void> {
         const url = 'http://auth:6000/generate-email-confirmation-code'
-        const headers = this.context.getHeaders();
+        this.context.startSpanWithContext("call.code.generation")
+        const headers = this.context.contextPropagationWith()
         await axios.post(url, { email }, { headers })
+        this.context.endSpanWithContext()
     }
 }
