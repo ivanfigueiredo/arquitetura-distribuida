@@ -28,7 +28,7 @@ export class MainLayer {
         await this.databaseConnection!.init();
         this.expressAdapter = new ExpressAdapter(this.span!, this.loggerContext!);
         this.unitOfWork = new UnitOfWork(this.databaseConnection);
-        this.userDatabase = new UserDatabase(this.unitOfWork);
+        this.userDatabase = new UserDatabase(this.unitOfWork, this.logger!);
         this.generateCodeConfirmationGateway = new GenerateCodeConfirmationGateway(this.span!);
         this.createUser = new CreateUser(
             this.userDatabase,

@@ -19,7 +19,7 @@ export class ExpenseCoreMain {
         const openTelemetrySdk = new OpenTelemetrySDK(this.serviceName, this.command);
         const expenseLogger = new ExpenserLogger(openTelemetrySdk.getLoggerProvider, this.serviceName);
         this.spanAdapter = new SpanAdapter(this.serviceName, '0.0.1');
-        this.rabbitMQAdapter = new RabbitMQAdapter(this.spanAdapter);
+        this.rabbitMQAdapter = new RabbitMQAdapter(this.spanAdapter, expenseLogger);
         await this.rabbitMQAdapter.connect();
         serviceInstance.rabbitMQAdapter = this.rabbitMQAdapter;
         serviceInstance.span = this.spanAdapter;
