@@ -17,7 +17,7 @@ export class GenerateEmailConfirmationCode implements IGenerateEmailConfirmation
         const code = Code.create(dto.email)
         this.logger.info(`GenerateEmailConfirmationCode - Codigo gerado para ${dto.email} com sucesso`)
         await this.codeRepository.save(code)
-        this.logger.info("GenerateEmailConfirmationCode - Chamando servico para notificacao de E-MAIL")
+        this.logger.info("GenerateEmailConfirmationCode - Chamando servico para notificacao de E-MAIL - Sincrono")
         await this.authGateway.createUserNotification({ email: dto.email, code: code.code })
     }
 }

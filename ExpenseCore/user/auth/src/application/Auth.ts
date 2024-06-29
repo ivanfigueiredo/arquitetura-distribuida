@@ -15,7 +15,7 @@ export class Auth implements IAuth {
         this.logger.info(`Auth - buscando usuario para o email: ${dto.email}`)
         const user = await this.userRepository.findUserByEmail(dto.email);
         if (!user.password.passwordMatches(dto.password)) {
-            this.logger.error("Auth - Email ou senha inválidos")
+            this.logger.error("Auth - Error: Email ou senha inválidos")
             throw new UnauthorizedException('Email or password invalid', 401);
         }
         const token = JWT.createToken('1h', user);

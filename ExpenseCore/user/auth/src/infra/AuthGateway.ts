@@ -1,11 +1,12 @@
 import axios from 'axios';
-import { ISpan, Queue } from 'expense-core';
+import { ILogger, ISpan, Queue } from 'expense-core';
 import { Data, IAuthGateway } from "../application/IAuthGateway";
 
 export class AuthGateway implements IAuthGateway {
     constructor(
         private readonly queue: Queue,
-        private readonly context: ISpan
+        private readonly context: ISpan,
+        private readonly logger: ILogger
     ) { }
 
     async createUserNotification(data: Data): Promise<void> {
@@ -24,10 +25,12 @@ export class AuthGateway implements IAuthGateway {
             )
             this.context.endSpanWithContext()
         } catch (error: any) {
+            this.logger.error(`AuthGateway - [createUserNotification] - Error: ${error.message}`)
             const exchange = 'generate.email.confirmation.events'
             const routeKey = 'user.created'
             this.context.startSpanWithContext("call.notification.email.sync")
             const headers = this.context.contextPropagationWith()
+            this.logger.info("AuthGateway - Fazendo chamada Assincrona")
             await this.queue.publish(exchange, routeKey, data, headers)
             this.context.endSpanWithContext()
         }

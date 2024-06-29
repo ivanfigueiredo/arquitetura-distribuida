@@ -1,6 +1,6 @@
+import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { DatabaseConnection } from "./DatabaseConnection";
-import "reflect-metadata";
 import { UserEntity } from "./entities/UserEntity";
 import { VerificationCodeEntity } from "./entities/VerificationCodeEntity";
 
