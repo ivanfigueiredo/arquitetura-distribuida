@@ -8,6 +8,6 @@ export class MainController {
     ) {
         httpClient.on("post", "/create-client", async function (params: any, data: any) {
             await clientRegistration.execute(data);
-		});
+        });
     }
 }
