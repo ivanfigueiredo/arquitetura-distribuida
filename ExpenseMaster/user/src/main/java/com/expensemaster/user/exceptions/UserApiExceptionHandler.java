@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class ApiExceptionHandler {
+public class UserApiExceptionHandler {
     private final ApiExpcetionBaseHandler apiExpcetionBaseHandler;
 
-    public ApiExceptionHandler() {
+    public UserApiExceptionHandler() {
         final var internalServerErrorHandler = new InternalServerErrorExceptionHandler();
         final var unauthorizedExceptionHandler = new UnauthorizedExceptionHandler(internalServerErrorHandler);
         this.apiExpcetionBaseHandler = new UnprocessableEntityExceptionHandler(unauthorizedExceptionHandler);
