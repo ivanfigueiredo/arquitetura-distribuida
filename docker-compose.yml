@@ -85,8 +85,8 @@ services:
     image: grafana/tempo:latest
     container_name: tempo
     ports:
-      - "3200:3200" # HTTP API
-      - "4318:4318" # otlp http
+      - "3200:3200"
+      - "4318:4318"
     volumes:
       - tempo-data:/var/lib/tempo
       - ./volumes/tempo/tempo-local.yml:/etc/tempo/tempo-local.yml
@@ -136,34 +136,34 @@ services:
       - opentelemetry-collector
       - flyway_db_user
 
-  # confirmation_email:
-  #   container_name: confirmation_email
-  #   restart: always
-  #   build:
-  #     context: ./ExpenseCore
-  #     dockerfile: Dockerfile_confirmation_email
-  #   networks:
-  #     - expense
-  #     - user
-  #   depends_on:
-  #     - user_db
-  #     - opentelemetry-collector
-  #     - flyway_db_user
+  confirmation_email:
+    container_name: confirmation_email
+    restart: always
+    build:
+      context: ./ExpenseCore
+      dockerfile: Dockerfile_confirmation_email
+    networks:
+      - expense
+      - user
+    depends_on:
+      - user_db
+      - opentelemetry-collector
+      - flyway_db_user
 
-  # client_registration:
-  #   container_name: client_registration
-  #   restart: always
-  #   build:
-  #     context: ./ExpenseCore
-  #     dockerfile: Dockerfile_client_registration
-  #   networks:
-  #     - expense
-  #     - client
-  #   depends_on:
-  #     - queue
-  #     - client_db
-  #     - opentelemetry-collector
-  #     - flyway_db_client
+  client_registration:
+    container_name: client_registration
+    restart: always
+    build:
+      context: ./ExpenseCore
+      dockerfile: Dockerfile_client_registration
+    networks:
+      - expense
+      - client
+    depends_on:
+      - queue
+      - client_db
+      - opentelemetry-collector
+      - flyway_db_client
 
   auth:
     build:
@@ -206,28 +206,28 @@ services:
       - queue
       - opentelemetry-collector
 
-  # flyway_db_client:
-  #   image: flyway/flyway
-  #   container_name: flyway_db_client
-  #   volumes:
-  #     - ./volumes/flyway/client_db:/flyway/sql
-  #   command: -url=jdbc:postgresql://client_db:5432/client_database -user=postgres_client -password=postgres_client migrate
-  #   depends_on:
-  #     - client_db
-  #   networks:
-  #     - client
+  flyway_db_client:
+    image: flyway/flyway
+    container_name: flyway_db_client
+    volumes:
+      - ./volumes/flyway/client_db:/flyway/sql
+    command: -url=jdbc:postgresql://client_db:5432/client_database -user=postgres_client -password=postgres_client migrate
+    depends_on:
+      - client_db
+    networks:
+      - client
 
-  # client_db:
-  #   image: postgres:latest
-  #   container_name: client_db
-  #   environment:
-  #     POSTGRES_USER: postgres_client
-  #     POSTGRES_PASSWORD: postgres_client
-  #     POSTGRES_DB: client_database
-  #   networks:
-  #     - client
-  #   ports:
-  #     - 5432:5432
+  client_db:
+    image: postgres:latest
+    container_name: client_db
+    environment:
+      POSTGRES_USER: postgres_client
+      POSTGRES_PASSWORD: postgres_client
+      POSTGRES_DB: client_database
+    networks:
+      - client
+    ports:
+      - 5432:5432
 
   # flyway_db_account:
   #   image: flyway/flyway

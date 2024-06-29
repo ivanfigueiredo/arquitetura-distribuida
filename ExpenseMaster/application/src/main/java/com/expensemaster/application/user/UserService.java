@@ -24,6 +24,7 @@ public class UserService implements IUserService {
 
     @Override
     public void confirmationEmail(ConfirmationEmailDto dto) {
+        LOGGER.info("Chamando microsserivo para confirmacao de E-mail");
         this.createUserGateway.confirmationEmail(dto);
     }
 }

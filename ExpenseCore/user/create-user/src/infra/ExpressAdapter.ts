@@ -20,8 +20,7 @@ export class ExpressAdapter implements HttpClient {
             try {
                 const traceparent = req.headers['traceparent'] as string
                 this.context.setContext({ traceparent })
-                this.loggerContext.setOtherContext({ traceparent })
-                this.context.startSpanWithoutContext("create.user.service.recieve")
+                this.context.startSpanWithoutContext("create.user.service.receive")
                 this.loggerContext.setContext(this.context.getSpanServer())
                 const output = await callback(req.params, req.body)
                 this.context.endSpanWithoutContext()

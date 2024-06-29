@@ -1,6 +1,7 @@
 package com.expensemaster.core;
 
 import com.expensemaster.application.ICallback;
+import com.expensemaster.client.IClientSpan;
 import com.expensemaster.user.IUserSpan;
 import io.opentelemetry.api.logs.LogRecordBuilder;
 import io.opentelemetry.api.trace.Span;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class SpanAdapter implements IUserSpan, ISpanAdapter {
+public class SpanAdapter implements IUserSpan, ISpanAdapter, IClientSpan {
     private final Tracer tracer;
     private final TextMapPropagator textMapPropagator;
     private final LogRecordBuilder logRecordBuilder;

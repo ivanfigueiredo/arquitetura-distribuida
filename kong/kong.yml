@@ -28,6 +28,18 @@ services:
           - GET
         preserve_host: false
         strip_path: false
+  - name: Clients
+    host: default_upstream
+    path: "/"
+    protocol: "http"
+    routes:
+      - name: client_registration
+        paths: 
+          - /client/registration
+        methods:
+          - POST
+        preserve_host: false
+        strip_path: false
 
 
 plugins:
@@ -46,6 +58,21 @@ plugins:
       origins: ["*"]
       methods: ["GET", "POST", "PUT", "DELETE"]
       headers: ["Origin", "Content-Type"]
+  - name: file-log
+    service: Clients
+    config:  
+      path: /var/log/kong/kong.log  
+  - name: rate-limiting
+    service: Clients
+    config:
+      minute: 10
+      limit_by: ip
+  - name: cors
+    service: Clients
+    config:
+      origins: ["*"]
+      methods: ["GET", "POST", "PUT", "DELETE"]
+      headers: ["Origin", "Content-Type"]
   - name: request-transformer
     route: user_activate
     config:
@@ -56,6 +83,28 @@ plugins:
           - email:$(query_params.email)
         headers:
           - Content-Type:application/json
+  - name: request-transformer
+    route: client_registration
+    config:
+      http_method: "POST"
+      add:
+        body:
+          - userId:$(query_params.userId)
+        headers:
+          - Content-Type:application/json
+  - name: opentelemetry
+    service: Clients
+    config:
+      endpoint: http://opentelemetry-collector:4318/v1/traces
+      resource_attributes:
+        service.name: api.gateway.client
+      propagation:
+        extract: [w3c]
+        inject: [preserve]
+        default_format: "w3c"
+      connect_timeout: 5000
+      send_timeout: 9000
+      read_timeout: 9000
   - name: opentelemetry
     service: Users
     config:
@@ -70,13 +119,13 @@ plugins:
       send_timeout: 9000
       read_timeout: 9000
     
-  # - name: jwt
-  #   route: user_activate
-  #   enabled: true
-  #   config:
-  #     key_claim_name: kid
-  #     claims_to_verify:
-  #       - exp
+  - name: jwt
+    route: client_registration
+    enabled: true
+    config:
+      key_claim_name: kid
+      claims_to_verify:
+        - exp
 
 consumers:
   - username: loginservice

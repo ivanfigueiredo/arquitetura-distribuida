@@ -42,6 +42,7 @@ CREATE TABLE "document" (
     document_id VARCHAR(36) NOT NULL PRIMARY KEY,
     client_id VARCHAR(36) NOT NULL,
     document_name VARCHAR(4) NOT NULL,
+    document_number VARCHAR(20) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
     CONSTRAINT fk_document_name FOREIGN KEY (document_name) REFERENCES document_name (document_name),
@@ -51,9 +52,9 @@ CREATE TABLE "document" (
 CREATE TABLE "profile" (
     profile_id VARCHAR(36) NOT NULL PRIMARY KEY,
     client_id VARCHAR(36) NOT NULL,
-    full_name VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NULL,
     phone_number VARCHAR(255) NOT NULL,
-    birthdate DATE NOT NULL,
+    birthdate DATE NULL,
     address_id VARCHAR(36) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,

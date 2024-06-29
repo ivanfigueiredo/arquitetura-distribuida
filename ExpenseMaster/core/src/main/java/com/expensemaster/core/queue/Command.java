@@ -38,7 +38,8 @@ public class Command implements ICommand {
             rabbitTemplate.setExchange(exchange);
             rabbitTemplate.setRoutingKey(routingKey);
             final var message = new Message(payload.getBytes(), context);
-            spanAdapter.startSpanWithContext("producer.create.user.event", () -> rabbitTemplate.convertAndSend(message));
+            final var spanName = "call." + exchange + "." + routingKey;
+            spanAdapter.startSpanWithContext(spanName, () -> rabbitTemplate.convertAndSend(message));
             logger.info("Evento publicado com sucesso");
         } catch (JsonProcessingException e) {
             logger.error(e.getMessage(), e);

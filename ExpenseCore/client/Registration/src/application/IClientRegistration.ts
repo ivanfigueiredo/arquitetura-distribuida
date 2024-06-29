@@ -1,5 +1,5 @@
-import { ClientDto } from "./dto/ClientDto";
+import { ClientRegistrationDto } from "./dto/ClientRegistrationDto";
 
 export interface IClientRegistration {
-    execute(dto: ClientDto): Promise<void>
+    execute(dto: ClientRegistrationDto): Promise<void>
 }

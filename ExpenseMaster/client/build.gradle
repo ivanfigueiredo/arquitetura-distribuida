@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.expensemaster.client'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":application"))
+    implementation('org.springframework.boot:spring-boot-starter-web:3.2.5')
+    implementation('org.springframework.boot:spring-boot-starter-amqp:3.2.5')
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.0'
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '8.0.1.Final'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6'
+    implementation('ch.qos.logback:logback-classic:1.5.6')
+}
+
+test {
+    useJUnitPlatform()
+}
