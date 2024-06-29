@@ -21,7 +21,7 @@ export class ExpressAdapter implements HttpClient {
             try {
                 const traceparent = req.headers['traceparent'] as string;
                 this.context.setContext({ traceparent })
-                this.context.startSpanWithoutContext("generate.code.confirmation.email.recieve")
+                this.context.startSpanWithoutContext("auth.authenticate.recieve")
                 this.loggerContext.setContext(this.context.getSpanServer())
                 const output = await callback(req.params, req.body)
                 this.context.endSpanWithoutContext()

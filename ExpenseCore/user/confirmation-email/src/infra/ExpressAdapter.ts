@@ -1,13 +1,16 @@
 import { HttpClient } from "./HttpClient";
 import express, { Request, Response } from 'express';
-import { ISpan } from 'expense-core';
+import { ILoggerContext, ISpan } from 'expense-core';
 import { DomainException } from "../domain/exception/DomainException";
 import { InternalServerErrorException } from "./exceptions/InternalServerErrorException";
 
 export class ExpressAdapter implements HttpClient {
     connect: any;
 
-    constructor(private readonly context: ISpan) {
+    constructor(
+        private readonly context: ISpan,
+        private readonly loggerContext: ILoggerContext
+    ) {
         this.connect = express();
         this.connect.use(express.json());
     }
@@ -16,11 +19,11 @@ export class ExpressAdapter implements HttpClient {
         this.connect[method](url, async (req: Request, res: Response) => {
             try {
                 const traceparent = req.headers['traceparent'] as string;
-                const correlationId = req.headers['correlationid'] as string;
-                this.context.setContext({ correlationId, traceparent });
-                this.context.startSpan("confirmation.email.service")
+                this.context.setContext({ traceparent });
+                this.context.startSpanWithoutContext("confirmation.email.service.recieve")
+                this.loggerContext.setContext(this.context.getSpanServer())
                 const output = await callback(req.params, req.body);
-                this.context.endSpan()
+                this.context.endSpanWithoutContext()
                 res.json(output);
             } catch (error: any) {
                 if (error instanceof DomainException) {
