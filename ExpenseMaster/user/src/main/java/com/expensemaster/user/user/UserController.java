@@ -24,23 +24,23 @@ public class UserController implements IUserAPI {
 
     private final IUserService userService;
 
-    private final IUserSpan userSpan;
+    private final IUserSpan span;
 
     public UserController(
             final IUserService userService,
-            final IUserSpan userSpan
+            final IUserSpan span
     ) {
         this.userService = Objects.requireNonNull(userService);
-        this.userSpan = Objects.requireNonNull(userSpan);
+        this.span = Objects.requireNonNull(span);
     }
 
     @Override
     public ResponseEntity<UserCreatedDto> createUser(final HttpServletRequest request, final CreateUserInput input) {
-        this.userSpan.setHttpRequest(request);
+        this.span.setHttpRequest(request);
         final var dto = new CreateUserDto(input.email(), input.password(), input.userType());
         AtomicReference<UserCreatedDto> output = new AtomicReference<UserCreatedDto>();
-        this.userSpan.startSpan("receive.from.kong", () -> {
-            logger.info("Recebendo requisição HTTP para criação de usuário");
+        this.span.startSpan("bus.receive.from.kong", () -> {
+            logger.info("Recebendo requisicao HTTP para criacao de usuario");
             output.set(userService.createUser(dto));
         });
         return new ResponseEntity<>(output.get(), HttpStatus.OK);
@@ -48,9 +48,10 @@ public class UserController implements IUserAPI {
 
     @Override
     public ResponseEntity<String> activate(final HttpServletRequest request, final UserConfirmationEmailInput input) {
-        this.userSpan.setHttpRequest(request);
+        this.span.setHttpRequest(request);
         final var dto = input.toDto();
-        this.userSpan.startSpan("receive.from.kong", () -> {
+        this.span.startSpan("bus.receive.from.kong", () -> {
+            logger.info("Recebendo requisicao HTTP para confirmacao do E-mail");
             userService.confirmationEmail(dto);
         });
         return new ResponseEntity<>(Template.confirmedEmail(), HttpStatus.OK);
