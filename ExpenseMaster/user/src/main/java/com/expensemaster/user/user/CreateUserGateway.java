@@ -60,7 +60,9 @@ public class CreateUserGateway implements ICreateUserGateway {
         try {
             final var interceptors = this.userSpan.contextPropagationApi();
             restTemplate.setInterceptors(interceptors);
-            this.restTemplate.postForLocation(this.confirmationEmailHost + "/verify", dto);
+            this.userSpan.startSpanWithContext("call.confirmation.email.service", () -> {
+                this.restTemplate.postForLocation(this.confirmationEmailHost + "/verify", dto);
+            });
         } catch (RestClientException e) {
             LOGGER.error(e.getMessage(), e);
             throw new InternalServerErrorException("Internal server error. If the error persists, contact support");
