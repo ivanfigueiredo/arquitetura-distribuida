@@ -29,6 +29,10 @@ export class UnitOfWork implements IUnitOfWorkInfra, IUnitOfWorkApplication {
   }
 
   public async release(): Promise<void> {
-    await this.queryRunner.release();    
+    await this.queryRunner.release();
+  }
+
+  public async findOne(query: { [key: string]: { [key: string]: string } }): Promise<UserEntity | null> {
+    return this.queryRunner.manager.findOne(UserEntity, query);
   }
 }
