@@ -29,9 +29,8 @@ export class AuthGateway implements IAuthGateway {
             const exchange = 'generate.email.confirmation.events'
             const routeKey = 'user.created'
             this.context.startSpanWithContext("call.notification.email.sync")
-            const headers = this.context.contextPropagationWith()
             this.logger.info("AuthGateway - Fazendo chamada Assincrona")
-            await this.queue.publish(exchange, routeKey, data, headers)
+            await this.queue.publish(exchange, routeKey, data)
             this.context.endSpanWithContext()
         }
     }
