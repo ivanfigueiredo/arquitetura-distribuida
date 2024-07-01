@@ -22,6 +22,7 @@
     "@opentelemetry/sdk-node": "^0.52.0",
     "@opentelemetry/semantic-conventions": "^1.24.0",
     "amqplib": "^0.10.3",
+    "redis": "^4.6.14",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typescript": "^4.9.5"
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/amqplib": "^0.10.3",
     "@types/node": "^20.12.7",
+    "@types/redis": "^4.0.11",
     "ts-loader": "^9.5.1"
   }
 }

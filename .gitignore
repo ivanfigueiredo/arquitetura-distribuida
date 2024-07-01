@@ -1,3 +1,5 @@
 .vscode
 README.md
 logs
+redis-data
+redis.conf

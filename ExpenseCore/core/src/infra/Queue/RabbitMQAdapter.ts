@@ -1,5 +1,6 @@
 import { ILoggerContext } from "../ILoggerContext"
 import { ISpan } from "../ISpan"
+import { IStateManagerSetup } from "../IStateManager"
 import { Queue } from "./Queue"
 import amqp from 'amqplib'
 
@@ -8,7 +9,8 @@ export class RabbitMQAdapter implements Queue {
 
 	constructor(
 		private readonly context: ISpan,
-		private readonly loggerContext: ILoggerContext
+		private readonly loggerContext: ILoggerContext,
+		private readonly stateManagerSetup: IStateManagerSetup
 	) { }
 
 	async connect(): Promise<void> {
@@ -19,9 +21,10 @@ export class RabbitMQAdapter implements Queue {
 		const channel = await this.connection.createChannel()
 		await channel.bindQueue(queueName, exchange, routeKey)
 		channel.consume(queueName, async (msg: any) => {
-			this.context.setContext({
-				traceparent: msg.properties.headers.traceparent
-			});
+			const traceparent = msg.properties.headers.traceparent
+			this.context.setContext({ traceparent })
+			const traceId = traceparent.split('-')[1]
+			this.stateManagerSetup.setTraceId(traceId)
 			const input = JSON.parse(msg.content.toString())
 			try {
 				this.context.startSpanWithoutContext(queueName + '.receive')
@@ -35,8 +38,11 @@ export class RabbitMQAdapter implements Queue {
 		});
 	}
 
-	async publish(exchange: string, routeKey: string, data: any, headers: { [key: string]: string }): Promise<void> {
+	async publish(exchange: string, routeKey: string, data: any): Promise<void> {
 		const channel = await this.connection.createChannel()
-		await channel.publish(exchange, routeKey, Buffer.from(JSON.stringify(data)), { headers })
+		const spanName = "call." + exchange + "." + routeKey
+		this.context.startSpanWithContext(spanName)
+		await channel.publish(exchange, routeKey, Buffer.from(JSON.stringify(data)), { headers: this.context.contextPropagationWith() })
+		this.context.endSpanWithContext()
 	}
 }
