@@ -121,6 +121,17 @@ services:
     networks:
       - expense
 
+  redis:
+    container_name: redis
+    image: redis:alpine
+    volumes:
+      - $PWD/redis-data:/var/lib/redis
+      - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - expense
+
   create_user:
     container_name: user_create
     restart: always
@@ -164,6 +175,7 @@ services:
       - client_db
       - opentelemetry-collector
       - flyway_db_client
+      - redis
 
   auth:
     build:
