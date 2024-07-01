@@ -1,4 +1,4 @@
-import { ExpenseCoreMain, ILogger, ILoggerContext, RabbitMQAdapter, SpanAdapter } from 'expense-core';
+import { ExpenseCoreMain, ILogger, ILoggerContext, IStateManeger, RabbitMQAdapter, SpanAdapter } from 'expense-core';
 import { ClientRegistration } from './application/ClientRegistration';
 import { ClientDatabase } from './infra/ClientDatabase';
 import { ExpressAdapter } from './infra/ExpressAdapter';
@@ -7,6 +7,8 @@ import { PostgresAdapter } from './infra/PostgresAdapter';
 import { DatabaseConnection } from './infra/DatabaseConnection';
 import { IClientRegistration } from './application/IClientRegistration';
 import QueueController from './infra/QueueController';
+import { ICreateClient } from './application/ICreateClient';
+import { CreateClient } from './application/CreateClient';
 
 export class MainLayer {
     public expressAdapter?: ExpressAdapter
@@ -14,10 +16,12 @@ export class MainLayer {
     public unitOfWork?: UnitOfWork
     public clientDatabase?: ClientDatabase
     public clientRegistration?: IClientRegistration
+    public createClient?: ICreateClient
     public span?: SpanAdapter
     public rabbitMQAdapter?: RabbitMQAdapter
     public logger?: ILogger
     public loggerContext?: ILoggerContext
+    public stateManager?: IStateManeger
 
     constructor() {
         this.databaseConnection = new PostgresAdapter();
@@ -28,8 +32,15 @@ export class MainLayer {
         this.expressAdapter = new ExpressAdapter(this.span!, this.loggerContext!);
         this.unitOfWork = new UnitOfWork(this.databaseConnection);
         this.clientDatabase = new ClientDatabase(this.unitOfWork);
-        this.clientRegistration = new ClientRegistration(this.clientDatabase, this.unitOfWork, this.logger!);
-        new QueueController(this.rabbitMQAdapter!, this.clientRegistration, this.logger!);
+        this.clientRegistration = new ClientRegistration(
+            this.clientDatabase,
+            this.unitOfWork,
+            this.logger!,
+            this.stateManager!,
+            this.rabbitMQAdapter!
+        );
+        this.createClient = new CreateClient(this.stateManager!, this.logger!)
+        new QueueController(this.rabbitMQAdapter!, this.clientRegistration, this.logger!, this.createClient!);
         this.expressAdapter!.listen(9001, () => { console.log("Rodando na porta 9001") });
     }
 
