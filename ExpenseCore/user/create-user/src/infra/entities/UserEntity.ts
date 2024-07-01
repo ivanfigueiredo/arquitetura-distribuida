@@ -1,24 +1,24 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { User } from "../../domain/User";
 
-@Entity({name: 'user'})
+@Entity({ name: 'user' })
 export class UserEntity {
-    @PrimaryColumn({name: 'id', type: 'varchar'})
+    @PrimaryColumn({ name: 'id', type: 'varchar' })
     userId: string;
 
-    @Column({name: 'email', type: 'varchar'})
+    @Column({ name: 'email', type: 'varchar' })
     email: string;
 
-    @Column({name: 'password', type: 'varchar'})
+    @Column({ name: 'password', type: 'varchar' })
     password: string;
 
-    @Column({name: 'user_type', type: 'varchar'})
+    @Column({ name: 'user_type', type: 'varchar' })
     userType: string;
 
-    @Column({name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP', nullable: false})
+    @Column({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP', nullable: false })
     createdAt: Date;
 
-    @Column({name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP', nullable: false})
+    @Column({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP', nullable: false })
     updatedAt: Date;
 
     constructor(
@@ -40,5 +40,9 @@ export class UserEntity {
 
     public static from(user: User): UserEntity {
         return new UserEntity(user.userId, user.email, user.password.value, user.userType, new Date(), new Date());
+    }
+
+    public to(): User {
+        return User.restore(this.userId, this.email, this.password, this.userType)
     }
 }
