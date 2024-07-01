@@ -8,10 +8,14 @@ export class User {
         readonly email: string,
         readonly password: Password,
         readonly userType: string
-    ) {}
+    ) { }
 
     public static create(email: string, password: string, userType: string): User {
-        const id = randomUUID();
-        return new User(id, email, Password.create(password), UserTypes[userType]);
+        const id = randomUUID()
+        return new User(id, email, Password.create(password), UserTypes[userType])
+    }
+
+    public static restore(userId: string, email: string, password: string, userType: string): User {
+        return new User(userId, email, Password.restore(password), userType)
     }
 }
