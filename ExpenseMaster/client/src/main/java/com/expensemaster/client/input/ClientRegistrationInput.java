@@ -7,9 +7,6 @@ public class ClientRegistrationInput {
     @NotNull(message = "phoneNumber is required")
     private String phoneNumber;
 
-    @NotNull(message = "email is required")
-    private String email;
-
     @NotNull(message = "clientType is required")
     private String clientType;
 
@@ -76,10 +73,6 @@ public class ClientRegistrationInput {
         this.companyReason = companyReason;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -118,10 +111,6 @@ public class ClientRegistrationInput {
 
     public String getCompanyReason() {
         return companyReason;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     @Override

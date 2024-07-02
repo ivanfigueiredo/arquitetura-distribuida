@@ -1,0 +1,57 @@
+@startuml
+package "Infraestrutura" {
+    node "Docker" {
+        [Kong API Gateway]
+        [Barramento]
+        node "Broker" {
+            [RabbitMQ]
+        }
+        node "Domain: User" {
+            [User Service]
+            [User DB]
+            [Flyway User]
+        }
+        node "Domain: Client" {
+            [Client Service]
+            [Client DB]
+            [Flyway Client]
+        }
+        node "Domain: Account" {
+            [Account Service]
+            [Account DB]
+            [Flyway Account]
+        }
+        node "OpenTelemetry: Collector" {
+            [OpenTelemetry]
+        }
+        node "Monitoramento" {
+            [Grafana Tempo]
+            [Grafana Loki]
+        }
+
+    }
+}
+
+[Kong API Gateway] --> [Barramento]
+[Barramento] --> [RabbitMQ]
+[RabbitMQ] --> [User Service] : Publishes Messages
+[RabbitMQ] --> [Client Service] : Publishes Messages
+[RabbitMQ] --> [Account Service] : Publishes Messages
+
+[User Service] --> [User DB] : Accesses
+[Client Service] --> [Client DB] : Accesses
+[Account Service] --> [Account DB] : Accesses
+
+[Flyway User] --> [User DB] : Manages Schemas
+[Flyway Client] --> [Client DB] : Manages Schemas
+[Flyway Account] --> [Account DB] : Manages Schemas
+
+[User Service] --> [OpenTelemetry] : Sends Traces and Logs
+[Client Service] --> [OpenTelemetry] : Sends Traces and Logs
+[Account Service] --> [OpenTelemetry] : Sends Traces and Logs
+[Barramento] --> [OpenTelemetry] : Sends Traces and Logs
+[Kong API Gateway] --> [OpenTelemetry] : Sends Traces and Logs
+
+[OpenTelemetry] --> [Grafana Tempo] : Sends Traces
+[OpenTelemetry] --> [Grafana Loki] : Sends Logs
+@enduml

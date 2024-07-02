@@ -42,7 +42,6 @@ public class ClientController implements IClientAPI {
                 input.getUserId(),
                 input.getBirthDate(),
                 input.getClientType(),
-                input.getEmail(),
                 Address.with(
                         input.getAddress().getState(),
                         input.getAddress().getCity(),
