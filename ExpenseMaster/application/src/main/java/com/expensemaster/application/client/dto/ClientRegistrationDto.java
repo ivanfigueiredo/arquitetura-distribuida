@@ -8,7 +8,6 @@ public record ClientRegistrationDto(
         String userId,
         String birthDate,
         String clientType,
-        String email,
         Address address,
         Contact contact,
         Document document
@@ -21,12 +20,11 @@ public record ClientRegistrationDto(
             final String userId,
             final String birthDate,
             final String clientType,
-            final String email,
             final Address address,
             final Contact contact,
             final Document document
             ) {
-        return new ClientRegistrationDto(name, fullName, companyReason, phoneNumber, userId, birthDate, clientType, email, address, contact, document);
+        return new ClientRegistrationDto(name, fullName, companyReason, phoneNumber, userId, birthDate, clientType, address, contact, document);
     }
 
     @Override
@@ -38,7 +36,6 @@ public record ClientRegistrationDto(
                 "userId: %s, " +
                 "birthDate: %s" +
                 "clientType: %s" +
-                "email: %s" +
                 "address: %s" +
                 "contact: %s" +
                 "document: %s" +
@@ -49,7 +46,6 @@ public record ClientRegistrationDto(
                 userId,
                 birthDate,
                 clientType,
-                email,
                 address,
                 contact,
                 document

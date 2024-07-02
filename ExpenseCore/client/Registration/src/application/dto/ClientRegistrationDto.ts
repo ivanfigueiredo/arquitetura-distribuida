@@ -11,7 +11,6 @@ export class ClientRegistrationDto {
         readonly userId: string,
         readonly birthDate: string | undefined,
         readonly clientType: string,
-        readonly email: string,
         readonly address: AddressDto,
         readonly contact: ContactDto,
         readonly document: DocumentDto
