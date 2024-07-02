@@ -1,0 +1,63 @@
+@startuml
+actor Actor
+
+rectangle "Kong API Gateway" {
+    [API Gateway]
+}
+
+rectangle "Barramento Java" {
+    [Barramento]
+}
+
+queue "RabbitMQ Broker" {
+    [RabbitMQ]
+}
+
+package "Microsserviços" {
+    node "Domain: Account" {
+        [Account Service]
+        database "Account" {
+            [Account DB]
+        }
+    }
+    node "Domain: User" {
+        [User Service]
+        database "User" {
+            [User DB]
+        }   
+    }
+    node "Domain: Client" {
+        [Client Service]
+        database "Client" {
+            [Client DB]
+        }
+    }
+}
+
+package "Monitoramento" {
+    [OpenTelemetry]
+    [Grafana Tempo]
+    [Grafana Loki]
+}
+
+Actor --> [API Gateway] : Requisição
+[API Gateway] --> [Barramento] : Roteia Requisição
+[Barramento] --> [RabbitMQ] : Publica Evento
+
+[RabbitMQ] --> [User Service] : Entrega Mensagem
+[RabbitMQ] --> [Client Service] : Entrega Mensagem
+[RabbitMQ] --> [Account Service] : Entrega Mensagem
+
+[User Service] --> [User DB] : Acessa Dados
+[Client Service] --> [Client DB] : Acessa Dados
+[Account Service] --> [Account DB] : Acessa Dados
+
+[User Service] --> [OpenTelemetry] : Envia Logs e Traces
+[Client Service] --> [OpenTelemetry] : Envia Logs e Traces
+[Account Service] --> [OpenTelemetry] : Envia Logs e Traces
+[Barramento] --> [OpenTelemetry] : Envia Logs e Traces
+[API Gateway] --> [OpenTelemetry] : Envia Logs e Traces
+
+[OpenTelemetry] --> [Grafana Tempo] : Envia Traces
+[OpenTelemetry] --> [Grafana Loki] : Envia Logs
+@enduml

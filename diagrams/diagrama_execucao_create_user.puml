@@ -1,0 +1,50 @@
+@startuml
+actor Actor
+
+rectangle "Kong API Gateway" {
+    [API Gateway]
+}
+
+rectangle "Barramento Java" {
+    [Barramento]
+}
+
+package "Microsserviços" {
+    node "Domain: User" {
+        [Create User]
+        [Generate Code]
+        database "User" {
+            [User DB]
+        }   
+    }
+    node "Notification E-mail" {
+        [MailDispatcher]
+    }
+}
+
+package "Monitoramento" {
+    [OpenTelemetry]
+    [Grafana Tempo]
+    [Grafana Loki]
+}
+
+Actor --> [API Gateway] : Requisição HTTP
+[API Gateway] --> [Barramento] : Roteia Requisição
+[Barramento] --> [Create User] : Requisição HTTP
+
+[Create User] --> [User DB] : Acessa Dados
+[Generate Code] --> [User DB]: Acessa Dados
+
+[Create User] --> [Generate Code]: HTTP - Gerar Código
+
+[Generate Code] --> [MailDispatcher]: HTTP - Notificação
+
+[Create User] --> [OpenTelemetry] : Envia Logs e Traces
+[Generate Code] --> [OpenTelemetry] : Envia Logs e Traces
+[Barramento] --> [OpenTelemetry] : Envia Logs e Traces
+[API Gateway] --> [OpenTelemetry] : Envia Logs e Traces
+[MailDispatcher] --> [OpenTelemetry] : Envia Logs e Traces
+
+[OpenTelemetry] --> [Grafana Tempo] : Envia Traces
+[OpenTelemetry] --> [Grafana Loki] : Envia Logs
+@enduml
