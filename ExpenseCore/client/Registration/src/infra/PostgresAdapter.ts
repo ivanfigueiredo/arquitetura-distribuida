@@ -1,10 +1,10 @@
-import { DataSource } from "typeorm";
-import { DatabaseConnection } from "./DatabaseConnection";
-import "reflect-metadata";
-import { ClientEntity } from "./entities/ClientEntity";
+import "reflect-metadata"
+import { DataSource } from "typeorm"
+import { DatabaseConnection } from "./DatabaseConnection"
+import { ClientEntity, ContactEntity, ProfileEntity } from "./entities"
 
 export class PostgresAdapter implements DatabaseConnection {
-    private connection: DataSource;
+    private connection: DataSource
 
     constructor() {
         this.connection = new DataSource({
@@ -15,8 +15,8 @@ export class PostgresAdapter implements DatabaseConnection {
             password: 'postgres_client',
             database: 'client_database',
             synchronize: false,
-            entities: [ClientEntity]
-        });
+            entities: [ClientEntity, ContactEntity, ProfileEntity]
+        })
     }
 
     async init(): Promise<void> {
@@ -26,6 +26,6 @@ export class PostgresAdapter implements DatabaseConnection {
     }
 
     public getDataSourcer(): DataSource {
-        return this.connection;
+        return this.connection
     }
 }
