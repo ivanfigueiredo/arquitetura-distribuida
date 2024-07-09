@@ -1,0 +1,2 @@
+INSERT INTO public.client_status (status_id,"status") VALUES ('cbd31d1c-4368-4560-8397-c415409a6f5c','ACTIVE');
+INSERT INTO public.client_status (status_id,"status") VALUES ('2eb91df9-d20c-468b-8b93-fc23f09850b2','CANCELED');
