@@ -27,9 +27,10 @@ export class StateManager implements IStateManeger, IStateManagerSetup {
         await this.client.set(prefixedKey, JSON.stringify(data), { EX: expiresAt ?? 15000, NX: true })
     }
 
-    public async get<T>(key: string): Promise<T> {
+    public async get<T>(key: string): Promise<T | null> {
         const prefixedKey = this.getPrefixedKey(key)
         const result = await this.client.get(prefixedKey)
-        return result as T;
+        if (!result) return null
+        return JSON.parse(result) as T
     }
 }

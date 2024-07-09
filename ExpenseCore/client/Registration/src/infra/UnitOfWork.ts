@@ -1,8 +1,8 @@
-import { QueryRunner } from 'typeorm';
+import { EntityTarget, ObjectLiteral, QueryRunner } from 'typeorm';
 import { IUnitOfWorkApplication } from '../application/IUnitOfWorkApplication';
 import { IUnitOfWorkInfra } from './IUnitOfWorkInfra';
 import { DatabaseConnection } from './DatabaseConnection';
-import { ClientEntity } from './entities/ClientEntity';
+import { ClientEntity } from './entities';
 
 export class UnitOfWork implements IUnitOfWorkInfra, IUnitOfWorkApplication {
   private readonly queryRunner: QueryRunner;
@@ -16,8 +16,8 @@ export class UnitOfWork implements IUnitOfWorkInfra, IUnitOfWorkApplication {
     await this.queryRunner.startTransaction();
   }
 
-  public async transaction(data: ClientEntity): Promise<void> {
-    await this.queryRunner.manager.save<ClientEntity>(data);
+  public async transaction<T>(data: T): Promise<void> {
+    await this.queryRunner.manager.save<T>(data);
   }
 
   public async commit(): Promise<void> {
@@ -29,6 +29,15 @@ export class UnitOfWork implements IUnitOfWorkInfra, IUnitOfWorkApplication {
   }
 
   public async release(): Promise<void> {
-    await this.queryRunner.release();    
+    await this.queryRunner.release();
+  }
+
+  public async findOne(clientId: string): Promise<ClientEntity | null> {
+    return this.queryRunner.manager
+      .createQueryBuilder(ClientEntity, 'client')
+      .innerJoinAndSelect('client.contactEntity', 'contact')
+      .innerJoinAndSelect('client.profileEntity', 'profile')
+      .where('client.clientId = :clientId', { clientId })
+      .getOne()
   }
 }

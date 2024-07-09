@@ -40,7 +40,9 @@ services:
     restart: always
     depends_on:
       - tempo
-    image: otel/opentelemetry-collector-contrib
+      - loki
+      - prometheus
+    image: otel/opentelemetry-collector-contrib:0.103.0
     ports:
       - "1888:1888"
       - "8888:8888"
@@ -167,6 +169,38 @@ services:
     build:
       context: ./ExpenseCore
       dockerfile: Dockerfile_client_registration
+    networks:
+      - expense
+      - client
+    depends_on:
+      - queue
+      - client_db
+      - opentelemetry-collector
+      - flyway_db_client
+      - redis
+
+  client_document:
+    container_name: client_document
+    restart: always
+    build:
+      context: ./ExpenseCore
+      dockerfile: Dockerfile_client_document
+    networks:
+      - expense
+      - client
+    depends_on:
+      - queue
+      - client_db
+      - opentelemetry-collector
+      - flyway_db_client
+      - redis
+
+  client_address:
+    container_name: client_address
+    restart: always
+    build:
+      context: ./ExpenseCore
+      dockerfile: Dockerfile_client_address
     networks:
       - expense
       - client
