@@ -1,0 +1,2 @@
+VHOST: /
+QUEUE: client.include-document.error.queue
