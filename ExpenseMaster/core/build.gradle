@@ -32,7 +32,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web:3.2.5')
     implementation(platform("io.opentelemetry:opentelemetry-bom:1.37.0"));
     implementation('org.springframework.boot:spring-boot-starter-amqp:3.2.5')
-    implementation('io.opentelemetry:opentelemetry-exporter-otlp:1.36.0')
+    implementation('io.opentelemetry:opentelemetry-exporter-otlp')
     implementation("io.opentelemetry:opentelemetry-api");
     implementation("io.opentelemetry:opentelemetry-sdk");
     implementation("io.opentelemetry:opentelemetry-exporter-logging")
