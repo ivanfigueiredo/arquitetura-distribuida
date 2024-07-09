@@ -4,33 +4,25 @@ CREATE TABLE "client_type" (
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
+CREATE TABLE "client_status" (
+    status_id VARCHAR(36) NOT NULL PRIMARY KEY,
+    status VARCHAR(55) NOT NULL UNIQUE
+);
+
 CREATE TABLE "client" (
     client_id VARCHAR(36) NOT NULL PRIMARY KEY,
     name VARCHAR(255) NULL,
     company_reason VARCHAR(255) NULL,
     client_type VARCHAR(2) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    status VARCHAR(55) NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
     user_id VARCHAR(36) NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    CONSTRAINT fk_client_type FOREIGN KEY (client_type) REFERENCES client_type (type)
-);
-
-CREATE TABLE "email_type" (
-    email_type_id VARCHAR(36) NOT NULL PRIMARY KEY,
-    type VARCHAR(255) NOT NULL UNIQUE
-);
-
-CREATE TABLE "email_info" (
-    email_id VARCHAR(36) NOT NULL PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    email_type VARCHAR(255) NOT NULL,
-    client_id VARCHAR(36) NOT NULL UNIQUE,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-
-
-    CONSTRAINT fk_email_type FOREIGN KEY (email_type) REFERENCES email_type (type),
-    CONSTRAINT fk_client FOREIGN KEY (client_id) REFERENCES client (client_id)
+    CONSTRAINT fk_client_type FOREIGN KEY (client_type) REFERENCES client_type (type),
+    CONSTRAINT fk_client_status FOREIGN KEY (status) REFERENCES client_status (status)
 );
 
 CREATE TABLE "document_name" (
@@ -50,12 +42,10 @@ CREATE TABLE "document" (
 );
 
 CREATE TABLE "profile" (
-    profile_id VARCHAR(36) NOT NULL PRIMARY KEY,
-    client_id VARCHAR(36) NOT NULL,
+    client_id VARCHAR(36) NOT NULL PRIMARY KEY,
     full_name VARCHAR(255) NULL,
     phone_number VARCHAR(255) NOT NULL,
     birthdate DATE NULL,
-    address_id VARCHAR(36) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
@@ -108,12 +98,12 @@ CREATE TABLE "relationship_types" (
 );
 
 CREATE TABLE "contact" (
-    contact_id VARCHAR(36) NOT NULL PRIMARY KEY,
-    client_id VARCHAR(36) NOT NULL,
+    client_id VARCHAR(36) NOT NULL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone_number VARCHAR(255) NOT NULL,
     relationship VARCHAR(255) NOT NULL,
 
+    CONSTRAINT fk_client FOREIGN KEY (client_id) REFERENCES client (client_id),
     CONSTRAINT fk_relationship FOREIGN KEY (relationship) REFERENCES relationship_types (type)
 );
