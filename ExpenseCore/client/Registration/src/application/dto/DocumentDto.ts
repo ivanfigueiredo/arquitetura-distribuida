@@ -1,6 +1,6 @@
 export class DocumentDto {
     constructor(
-        readonly documentName: string,
+        readonly documentType: string,
         readonly documentNumber: string
     ) { }
 }
