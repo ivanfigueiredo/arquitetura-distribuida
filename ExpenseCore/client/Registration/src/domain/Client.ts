@@ -1,25 +1,46 @@
 import { randomUUID } from "crypto";
-import { ClientType, ClientTypeEnum } from "./ClientType";
+import { ClientType, ClientTypeEnum, RestoreClientTypeEnum } from "./ClientType";
 import { DomainException } from "./exception/DomainException";
+import { ClientStatus } from "./ClientStatus";
+import { Contact } from "./Contact";
 
 export class Client {
-    readonly clientType: string;
-    readonly email: string;
-    readonly userId: string;
-    readonly name?: string;
-    readonly companyReason?: string;
+    readonly clientType: string
 
-    private constructor(readonly clientId: string, clientType: string, email: string, userId: string, name?: string, companyReason?: string) {
-        this.isValidClientType(clientType);
-        this.isValidNaturalPerson(clientType, name);
-        this.existCompanyReasonToNaturalPerson(clientType, companyReason);
-        this.isValidLegalPerson(clientType, companyReason);
-        this.existNameToCompanyReason(clientType, name);
-        this.clientType = ClientTypeEnum[clientType];
-        this.email = email;
-        this.name = name;
-        this.companyReason = companyReason;
-        this.userId = userId;
+    private constructor(
+        readonly id: string,
+        type: string,
+        readonly email: string,
+        readonly userId: string,
+        readonly phoneNumber: string,
+        private status: string,
+        private active: boolean,
+        readonly contact: Contact,
+        readonly name?: string,
+        readonly companyReason?: string,
+        readonly fullName?: string,
+        readonly birthDate?: string
+
+    ) {
+        this.isValidClientType(type)
+        this.isValidNaturalPerson(type, name)
+        this.existCompanyReasonToNaturalPerson(type, companyReason)
+        this.isValidLegalPerson(type, companyReason)
+        this.existNameToCompanyReason(type, name)
+        this.clientType = ClientTypeEnum[type]
+    }
+
+    public canceledClient(): void {
+        this.active = false
+        this.status = ClientStatus.canceled
+    }
+
+    public get getStatus(): string {
+        return this.status
+    }
+
+    public get getActive(): boolean {
+        return this.active
     }
 
     private isValidClientType(clientType: string): void {
@@ -30,7 +51,7 @@ export class Client {
 
     private isValidNaturalPerson(clientType: string, name?: string): void {
         if (ClientTypeEnum[clientType] === ClientType.Individual && !name) {
-            throw new DomainException("Name field is mandatory for registering an individual.", 422);
+            throw new DomainException("Name field is mandatory for registering an individual.", 422)
         }
     }
 
@@ -52,8 +73,85 @@ export class Client {
         }
     }
 
-    public static create(clientType: string, email: string, userId: string, name?: string, companyReason?: string): Client {
+    public static create(
+        clientType: string,
+        email: string,
+        userId: string,
+        phoneNumber: string,
+        contact: {
+            name: string,
+            email: string,
+            phoneNumber: string,
+            relationship: string
+        },
+        name?: string,
+        companyReason?: string,
+        fullName?: string,
+        birthDate?: string
+    ): Client {
         const clientId = randomUUID();
-        return new Client(clientId, clientType, email, userId, name, companyReason);
+        const active = true;
+        return new Client(
+            clientId,
+            clientType,
+            email,
+            userId,
+            phoneNumber,
+            ClientStatus.active,
+            active,
+            Contact.create(
+                clientId,
+                contact.name,
+                contact.email,
+                contact.phoneNumber,
+                contact.relationship
+            ),
+            name,
+            companyReason,
+            fullName,
+            birthDate
+        );
+    }
+
+    public static restore(
+        clientId: string,
+        clientType: string,
+        email: string,
+        userId: string,
+        phoneNumber: string,
+        active: boolean,
+        status: string,
+        contact: {
+            clientId: string,
+            name: string,
+            email: string,
+            phoneNumber: string,
+            relationship: string
+        },
+        name?: string,
+        companyReason?: string,
+        fullName?: string,
+        birthDate?: string
+    ): Client {
+        return new Client(
+            clientId,
+            RestoreClientTypeEnum[clientType],
+            email,
+            userId,
+            phoneNumber,
+            status,
+            active,
+            Contact.restore(
+                contact.clientId,
+                contact.name,
+                contact.email,
+                contact.phoneNumber,
+                contact.relationship
+            ),
+            name,
+            companyReason,
+            fullName,
+            birthDate
+        );
     }
 }
