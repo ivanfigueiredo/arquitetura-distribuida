@@ -12,7 +12,7 @@ export class ExcludeDocument implements IExcludeDocument {
 
     async execute(): Promise<void> {
         try {
-            this.logger.info(`ExcludeDocument - Iniciando microsservico para inclusao do documento`)
+            this.logger.info(`ExcludeDocument - Iniciando microsservico para exclusao do documento`)
             const documentCreated = await this.stateManager.get<DocumentCreatedDto>('DocumentIncluded')
             if (documentCreated) {
                 this.logger.info(`ExcludeDocument - Recuperando Estado de IncludeDocument`)
@@ -20,8 +20,9 @@ export class ExcludeDocument implements IExcludeDocument {
                 if (document) {
                     await this.documentRepository.delete(document)
                 }
+            } else {
+                this.logger.info(`ExcludeDocument - Estado nao recuperado`)
             }
-            this.logger.info(`ExcludeDocument - Estado nao recuperado`)
         } catch (error: any) {
             this.logger.error(`ExcludeDocument - Error: ${error.message}`)
         }

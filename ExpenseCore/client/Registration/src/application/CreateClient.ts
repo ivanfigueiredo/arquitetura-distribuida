@@ -19,7 +19,7 @@ export class CreateClient implements ICreateClient {
 
     public async execute(dto: UserInfoDto): Promise<void> {
         try {
-            this.logger.info(`CreateClient - Iniciando Step para criacao do cliente`)
+            this.logger.info(`CreateClient - Iniciando Step 2 para criacao do cliente`)
             await this.unitOfWork.startTransaction();
             this.logger.info(`CreateClient - Recuperando estado da execucao`)
             const createClientDto = await this.stateManager.get<ClientRegistrationDto>('createClient')
@@ -39,6 +39,8 @@ export class CreateClient implements ICreateClient {
             )
             await this.repository.save(client)
             await this.unitOfWork.commit()
+            this.logger.info('CreateClient - Salvando Estado da criacao do Cliente')
+            await this.stateManager.set<ClientCreatedDto>('ClientCreated', { clientId: client.id }, 400000)
             this.logger.info(`CreateClient - Client Salvo com sucesso`)
             this.logger.info(`CreateClient - Chamando microsservico para cadastro do documento`)
             await this.queue.publish(
@@ -50,20 +52,6 @@ export class CreateClient implements ICreateClient {
                     documentNumber: createClientDto.document.documentNumber
                 }
             )
-            this.logger.info('CreateClient - Chamando microsservico para cadastro do endereco')
-            await this.queue.publish(
-                'client.events',
-                'client.include-address',
-                {
-                    clientId: client.id,
-                    city: createClientDto.address.city,
-                    street: createClientDto.address.street,
-                    postalCode: createClientDto.address.postalCode,
-                    state: createClientDto.address.state,
-                    country: createClientDto.address.country
-                }
-            )
-            await this.stateManager.set<ClientCreatedDto>('ClientCreated', { clientId: client.id })
         } catch (error: any) {
             this.logger.error(`CreateClient - Error: ${error.message}`)
             await this.queue.publish('client.events', 'client.registration.error', { error: { message: error.message } })

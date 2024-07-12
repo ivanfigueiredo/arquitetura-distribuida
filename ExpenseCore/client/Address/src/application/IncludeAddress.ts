@@ -1,14 +1,12 @@
-import { ILogger, IStateManeger, Queue } from "expense-core";
+import { ILogger, Queue } from "expense-core";
 import { IncludeAddressDto } from "./dto/IncludeAddressDto";
 import { IAddressRepository } from "./IAddressRepository";
 import { IIncludeAddress } from "./IIncludeAddress";
 import { Address } from "../domain/Address";
-import { AddressIncludedDto } from "./dto/AddressIncludedDto";
 
 export class IncludeAddress implements IIncludeAddress {
     constructor(
         private readonly addressRepository: IAddressRepository,
-        private readonly stateManager: IStateManeger,
         private readonly logger: ILogger,
         private readonly queue: Queue
     ) { }
@@ -26,11 +24,32 @@ export class IncludeAddress implements IIncludeAddress {
             )
             await this.addressRepository.save(address)
             this.logger.info(`IncludeAddress - Endereco salvo com sucesso`)
-            this.logger.info(`IncludeAddress - Salvo Estado da execucao`)
-            await this.stateManager.set<AddressIncludedDto>('AddressIncluded', address)
+            this.logger.info('IncludeAddress - Chamando ClientRegistration')
+            await this.queue.publish(
+                'client.events',
+                'client.registration.step-4',
+                {
+                    address: {
+                        id: address.id,
+                        city: address.city,
+                        street: address.street,
+                        postalCode: address.postalCode,
+                        state: address.state,
+                        country: address.country
+                    },
+                    error: undefined
+                }
+            )
         } catch (error: any) {
             this.logger.error(`IncludeAddress - Error: ${error.message}`)
-            await this.queue.publish('client.events', 'client.include-address.error', { error: { message: error.message } })
+            await this.queue.publish(
+                'client.events',
+                'client.registration.step-4',
+                {
+                    address: undefined,
+                    error: { message: error.message }
+                }
+            )
         }
     }
 }

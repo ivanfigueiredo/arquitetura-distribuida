@@ -1,6 +1,8 @@
-export interface UserInfoDto {
-    userId: string;
-    email: string;
-    password: string;
-    userType: string;
+export class UserInfoDto {
+    constructor(
+        readonly userId: string,
+        readonly email: string,
+        readonly password: string,
+        readonly userType: string
+    ) { }
 }

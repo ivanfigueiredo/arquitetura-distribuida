@@ -24,9 +24,29 @@ export class IncludeDocument implements IIncludeDocument {
                 'DocumentIncluded',
                 new DocumentCreatedDto(document.id, document.clientId, document.documentName, document.documentNumber.value)
             )
+            this.logger.info('IncludeDocument - Chamando ClientRegistration')
+            await this.queue.publish(
+                'client.events',
+                'client.registration.step-3',
+                {
+                    document: {
+                        id: document.id,
+                        documentName: document.documentName,
+                        documentNumber: document.documentNumber,
+                    },
+                    error: undefined
+                }
+            )
         } catch (error: any) {
             this.logger.error(`IncludeDocument - Error: ${error.message}`)
-            await this.queue.publish('client.events', 'client.include-document.error', { error: { message: error.message } })
+            await this.queue.publish(
+                'client.events',
+                'client.registration.step-3',
+                {
+                    document: undefined,
+                    error: { message: error.message }
+                }
+            )
         }
     }
 }

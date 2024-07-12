@@ -1,3 +1,3 @@
-export interface ClientCreatedDto {
-    clientId: string
+export class ClientCreatedDto {
+    constructor(readonly clientId: string) { }
 }

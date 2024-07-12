@@ -22,8 +22,8 @@ export class UserInfo implements IUserInfo {
             }
             this.logger.info(`UserInfo - Retornando informacao do usuario`)
             await this.queue.publish(
-                'user.events',
-                'user.info',
+                'client.events',
+                'client.registration.step-2',
                 {
                     userId: user.userId,
                     email: user.email,
@@ -43,8 +43,8 @@ export class UserInfo implements IUserInfo {
             }
             this.logger.info(`UserInfo - Retornando informacao do usuario`)
             await this.queue.publish(
-                'user.events',
-                'user.info',
+                'client.events',
+                'client.registration.step-2',
                 {
                     userId: user.userId,
                     email: user.email,
