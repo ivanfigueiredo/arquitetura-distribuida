@@ -255,6 +255,7 @@ services:
   flyway_db_client:
     image: flyway/flyway
     container_name: flyway_db_client
+    restart: always
     volumes:
       - ./volumes/flyway/client_db:/flyway/sql
     command: -url=jdbc:postgresql://client_db:5432/client_database -user=postgres_client -password=postgres_client migrate
@@ -301,6 +302,7 @@ services:
   flyway_db_user:
     image: flyway/flyway
     container_name: flyway_db_user
+    restart: always
     volumes:
       - ./volumes/flyway/user_db:/flyway/sql
     command: -url=jdbc:postgresql://user_db:5432/user_database -user=postgres_user -password=postgres_user migrate
