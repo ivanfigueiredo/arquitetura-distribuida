@@ -21,12 +21,6 @@ export class ClientEntity {
     @Column({ name: 'email', type: 'varchar', nullable: false })
     email: string;
 
-    @Column({ name: 'status', type: 'varchar', nullable: false })
-    status: string;
-
-    @Column({ name: 'active', type: 'boolean', nullable: false })
-    active: boolean;
-
     @Column({ name: 'company_reason', type: 'varchar', nullable: true })
     companyReason?: string;
 
@@ -48,8 +42,6 @@ export class ClientEntity {
         userId: string,
         clientType: string,
         email: string,
-        status: string,
-        active: boolean,
         createdAt: Date,
         updatedAt: Date,
         name: string | undefined,
@@ -61,8 +53,6 @@ export class ClientEntity {
         this.userId = userId;
         this.clientType = clientType;
         this.email = email;
-        this.status = status;
-        this.active = active;
         this.name = name;
         this.companyReason = companyReason;
         this.createdAt = createdAt;
@@ -78,8 +68,6 @@ export class ClientEntity {
             client.userId,
             client.clientType,
             client.email,
-            client.getStatus,
-            client.getActive,
             new Date(),
             new Date(),
             client.name,
@@ -103,8 +91,6 @@ export class ClientEntity {
             this.email,
             this.userId,
             this.profileEntity!.phoneNumber,
-            this.active,
-            this.status,
             Contact.restore(
                 this.contactEntity!.clientId,
                 this.contactEntity!.name,

@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
 import { ClientType, ClientTypeEnum, RestoreClientTypeEnum } from "./ClientType";
 import { DomainException } from "./exception/DomainException";
-import { ClientStatus } from "./ClientStatus";
 import { Contact } from "./Contact";
 
 export class Client {
@@ -13,8 +12,6 @@ export class Client {
         readonly email: string,
         readonly userId: string,
         readonly phoneNumber: string,
-        private status: string,
-        private active: boolean,
         readonly contact: Contact,
         readonly name?: string,
         readonly companyReason?: string,
@@ -28,19 +25,6 @@ export class Client {
         this.isValidLegalPerson(type, companyReason)
         this.existNameToCompanyReason(type, name)
         this.clientType = ClientTypeEnum[type]
-    }
-
-    public canceledClient(): void {
-        this.active = false
-        this.status = ClientStatus.canceled
-    }
-
-    public get getStatus(): string {
-        return this.status
-    }
-
-    public get getActive(): boolean {
-        return this.active
     }
 
     private isValidClientType(clientType: string): void {
@@ -97,8 +81,6 @@ export class Client {
             email,
             userId,
             phoneNumber,
-            ClientStatus.active,
-            active,
             Contact.create(
                 clientId,
                 contact.name,
@@ -119,8 +101,6 @@ export class Client {
         email: string,
         userId: string,
         phoneNumber: string,
-        active: boolean,
-        status: string,
         contact: {
             clientId: string,
             name: string,
@@ -139,8 +119,6 @@ export class Client {
             email,
             userId,
             phoneNumber,
-            status,
-            active,
             Contact.restore(
                 contact.clientId,
                 contact.name,

@@ -1,5 +1,3 @@
-import { randomUUID } from "crypto";
-
 export class Contact {
     private constructor(
         readonly clientId: string,
