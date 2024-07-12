@@ -27,7 +27,7 @@ export class RabbitMQAdapter implements Queue {
 			this.stateManagerSetup.setTraceId(traceId)
 			const input = JSON.parse(msg.content.toString())
 			try {
-				this.context.startSpanWithoutContext(queueName + '.receive')
+				this.context.startSpanWithoutContext(queueName)
 				this.loggerContext.setContext(this.context.getSpanServer())
 				await callback(input)
 				channel.ack(msg)
@@ -40,7 +40,7 @@ export class RabbitMQAdapter implements Queue {
 
 	async publish(exchange: string, routeKey: string, data: any): Promise<void> {
 		const channel = await this.connection.createChannel()
-		const spanName = "call." + exchange + "." + routeKey
+		const spanName = "call." + routeKey
 		this.context.startSpanWithContext(spanName)
 		await channel.publish(exchange, routeKey, Buffer.from(JSON.stringify(data)), { headers: this.context.contextPropagationWith() })
 		this.context.endSpanWithContext()
