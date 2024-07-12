@@ -4,25 +4,17 @@ CREATE TABLE "client_type" (
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
-CREATE TABLE "client_status" (
-    status_id VARCHAR(36) NOT NULL PRIMARY KEY,
-    status VARCHAR(55) NOT NULL UNIQUE
-);
-
 CREATE TABLE "client" (
     client_id VARCHAR(36) NOT NULL PRIMARY KEY,
     name VARCHAR(255) NULL,
     company_reason VARCHAR(255) NULL,
     client_type VARCHAR(2) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    status VARCHAR(55) NOT NULL,
-    active BOOLEAN DEFAULT TRUE,
     user_id VARCHAR(36) NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    CONSTRAINT fk_client_type FOREIGN KEY (client_type) REFERENCES client_type (type),
-    CONSTRAINT fk_client_status FOREIGN KEY (status) REFERENCES client_status (status)
+    CONSTRAINT fk_client_type FOREIGN KEY (client_type) REFERENCES client_type (type)
 );
 
 CREATE TABLE "document_name" (

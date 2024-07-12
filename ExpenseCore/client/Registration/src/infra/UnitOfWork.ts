@@ -20,6 +20,10 @@ export class UnitOfWork implements IUnitOfWorkInfra, IUnitOfWorkApplication {
     await this.queryRunner.manager.save<T>(data);
   }
 
+  public async delete<T extends ObjectLiteral>(entityTarget: EntityTarget<T>, criteria: { [key: string]: string }): Promise<void> {
+    await this.queryRunner.manager.delete<T>(entityTarget, criteria)
+  }
+
   public async commit(): Promise<void> {
     await this.queryRunner.commitTransaction();
   }

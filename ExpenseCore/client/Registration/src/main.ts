@@ -9,10 +9,12 @@ import { IClientRegistration } from './application/IClientRegistration';
 import QueueController from './infra/QueueController';
 import { ICreateClient } from './application/ICreateClient';
 import { CreateClient } from './application/CreateClient';
-import { IClientIncludeAddressError } from './application/IClientIncludeAddressError';
-import { IClientIncludeDocumentError } from './application/IClientIncludeDocumentError';
-import { ClientIncludeAddressError } from './application/ClientIncludeAddressError';
-import { ClientIncludeDocumentError } from './application/ClientIncludeDocumentError';
+import { IClientIncludedAddress } from './application/IClientIncludedAddress';
+import { IClientIncludedDocument } from './application/IClientIncludedDocument';
+import { ClientIncludedAddress } from './application/ClientIncludedAddress';
+import { ClientIncludedDocument } from './application/ClientIncludedDocument';
+import { IExcludeClient } from './application/IExcludeClient';
+import { ExcludeClient } from './application/ExcludeClient';
 
 export class MainLayer {
     public expressAdapter?: ExpressAdapter
@@ -20,8 +22,9 @@ export class MainLayer {
     public unitOfWork?: UnitOfWork
     public clientDatabase?: ClientDatabase
     public clientRegistration?: IClientRegistration
-    public clientIncludeAddressError?: IClientIncludeAddressError
-    public clientIncludeDocumentError?: IClientIncludeDocumentError
+    public clientIncludecAddress?: IClientIncludedAddress
+    public clientIncludedDocument?: IClientIncludedDocument
+    public excludeClient?: IExcludeClient
     public createClient?: ICreateClient
     public span?: SpanAdapter
     public rabbitMQAdapter?: RabbitMQAdapter
@@ -50,28 +53,34 @@ export class MainLayer {
             this.logger!,
             this.rabbitMQAdapter!
         )
-        this.clientIncludeAddressError = new ClientIncludeAddressError(
-            this.unitOfWork!,
+        this.clientIncludecAddress = new ClientIncludedAddress(
             this.stateManager!,
             this.rabbitMQAdapter!,
-            this.clientDatabase!,
             this.logger!
         )
-        this.clientIncludeDocumentError = new ClientIncludeDocumentError(
+        this.clientIncludedDocument = new ClientIncludedDocument(
             this.unitOfWork!,
             this.stateManager!,
             this.clientDatabase!,
             this.rabbitMQAdapter!,
             this.logger!
+        )
+        this.excludeClient = new ExcludeClient(
+            this.clientDatabase!,
+            this.unitOfWork!,
+            this.stateManager!,
+            this.logger!,
+            this.rabbitMQAdapter!
         )
         new QueueController(
             this.rabbitMQAdapter!,
             this.clientRegistration,
             this.logger!,
             this.createClient!,
-            this.clientIncludeAddressError!,
-            this.clientIncludeDocumentError!
-        );
+            this.clientIncludecAddress!,
+            this.clientIncludedDocument!,
+            this.excludeClient!
+        )
         this.expressAdapter!.listen(9001, () => { console.log("Rodando na porta 9001") });
     }
 

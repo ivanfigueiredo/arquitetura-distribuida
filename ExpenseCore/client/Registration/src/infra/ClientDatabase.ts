@@ -34,6 +34,17 @@ export class ClientDatabase implements IClientRepository {
         }
     }
 
+    async delete(client: Client): Promise<void> {
+        try {
+            await this.unitOfWork.delete<ProfileEntity>(ProfileEntity, { clientId: client.id })
+            await this.unitOfWork.delete<ContactEntity>(ContactEntity, { clientId: client.id })
+            await this.unitOfWork.delete<ClientEntity>(ClientEntity, { clientId: client.id })
+        } catch (error: any) {
+            this.logger.error(`ClientDatabase - [delete] - Error: ${error.message}`)
+            throw new InternalServerErrorException("Internal server error. If the error persists, contact support", 500)
+        }
+    }
+
     async findClientById(clientId: string): Promise<Client | null> {
         const client = await this.unitOfWork.findOne(clientId)
         if (client) return client.to()

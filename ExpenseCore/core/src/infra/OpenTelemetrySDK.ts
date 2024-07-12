@@ -49,7 +49,12 @@ export class OpenTelemetrySDK {
 
         this.logRecordProcessor = new BatchLogRecordProcessor(this.otlpLogExporter);
         this.loggerProvider.addLogRecordProcessor(this.logRecordProcessor);
-        this.spanProcessor = new BatchSpanProcessor(this.otlpTraceExporter);
+        this.spanProcessor = new BatchSpanProcessor(this.otlpTraceExporter, {
+            maxQueueSize: 2000,
+            scheduledDelayMillis: 5000,
+            exportTimeoutMillis: 30000,
+            maxExportBatchSize: 512,
+        });
         this.sdk = new NodeSDK({
             resource,
             traceExporter: this.otlpTraceExporter,
@@ -57,7 +62,7 @@ export class OpenTelemetrySDK {
             logRecordProcessor: this.logRecordProcessor,
             metricReader: new PeriodicExportingMetricReader({
                 exporter: metricExporter,
-            })
+            }),
         });
         this.sdk.start();
     }
