@@ -1,8 +1,10 @@
+import amqp from 'amqplib'
+import retry from 'async-retry'
 import { ILoggerContext } from "../ILoggerContext"
 import { ISpan } from "../ISpan"
 import { IStateManagerSetup } from "../IStateManager"
 import { Queue } from "./Queue"
-import amqp from 'amqplib'
+import { RetryEnum } from './RetryEnum'
 
 export class RabbitMQAdapter implements Queue {
 	private connection: any
@@ -27,13 +29,33 @@ export class RabbitMQAdapter implements Queue {
 			this.stateManagerSetup.setTraceId(traceId)
 			const input = JSON.parse(msg.content.toString())
 			try {
-				this.context.startSpanWithoutContext(queueName)
-				this.loggerContext.setContext(this.context.getSpanServer())
-				await callback(input)
-				channel.ack(msg)
-				this.context.endSpanWithoutContext()
+				await retry(async () => {
+					this.context.startSpanWithoutContext(queueName)
+					this.loggerContext.setContext(this.context.getSpanServer())
+					try {
+						await callback(input)
+						channel.ack(msg)
+						this.context.endSpanWithoutContext()
+					} catch (error: any) {
+						this.context.endSpanWithoutContext()
+						throw error
+					}
+				}, {
+					retries: RetryEnum.RETRIES,
+					factor: RetryEnum.FACTOR,
+					minTimeout: RetryEnum.MIN_TIMEOUT,
+					maxRetryTime: RetryEnum.MAX_TIMEOUT,
+					onRetry: (error: any, _) => {
+						console.log(`Error: ${error.message}`)
+					}
+				})
+				// this.context.startSpanWithoutContext(queueName)
+				// this.loggerContext.setContext(this.context.getSpanServer())
+				// await callback(input)
+				// channel.ack(msg)
+				// this.context.endSpanWithoutContext()
 			} catch (e: any) {
-				console.log(e.message)
+				channel.nack(msg, false, false)
 			}
 		});
 	}
