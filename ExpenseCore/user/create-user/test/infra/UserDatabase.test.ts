@@ -3,6 +3,7 @@ import { IUnitOfWorkInfra } from "../../src/infra/IUnitOfWorkInfra"
 import { IUserRepository } from "../../src/application/IUserRepository"
 import { UserDatabase } from "../../src/infra/UserDatabase"
 import { User } from "../../src/domain/User"
+import { InternalServerErrorException } from "../../src/application/exceptions/InternalServerErrorException"
 
 describe('UserDatabase', () => {
     let unitOfWork: IUnitOfWorkInfra
@@ -31,5 +32,16 @@ describe('UserDatabase', () => {
         await userDatabase.save(user)
 
         expect(spyOnTransaction).toHaveBeenCalledTimes(1)
+    })
+
+    test('Deve lançar uma exceção caso ocorra um erro', async () => {
+        const user = User.create('test@mail.com', 'S&nh@123', 'Individual')
+        const spyOnLogger = jest.spyOn(logger, 'error')
+        jest.spyOn(unitOfWork, 'transaction').mockImplementation((): never => { throw new Error() })
+        const promise = userDatabase.save(user)
+        await expect(promise).rejects.toThrow(
+            new InternalServerErrorException("Internal server error. If the error persists, contact support", 500)
+        )
+        expect(spyOnLogger).toHaveBeenCalledTimes(1)
     })
 })
