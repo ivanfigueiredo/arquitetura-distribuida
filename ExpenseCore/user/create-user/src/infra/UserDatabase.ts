@@ -3,7 +3,7 @@ import { IUserRepository } from "../application/IUserRepository";
 import { User } from "../domain/User";
 import { IUnitOfWorkInfra } from './IUnitOfWorkInfra';
 import { UserEntity } from "./entities/UserEntity";
-import { InternalServerErrorException } from "./exceptions/InternalServerErrorException";
+import { InternalServerErrorException } from "../application/exceptions/InternalServerErrorException";
 
 export class UserDatabase implements IUserRepository {
     constructor(
