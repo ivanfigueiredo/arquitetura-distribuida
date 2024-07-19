@@ -31,4 +31,9 @@ describe("Password", () => {
         const password = Password.create('S&nh@123')
         expect(password.passwordMatches('S&nh@123')).toBeTruthy()
     })
+
+    test('Deve restaurar uma senha com sucesso', () => {
+        const restorePassword = Password.restore('S&nh@123')
+        expect(restorePassword).toBeInstanceOf(Password)
+    })
 })
