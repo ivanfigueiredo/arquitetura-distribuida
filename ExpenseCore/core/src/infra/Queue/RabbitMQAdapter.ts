@@ -49,11 +49,6 @@ export class RabbitMQAdapter implements Queue {
 						console.log(`Error: ${error.message}`)
 					}
 				})
-				// this.context.startSpanWithoutContext(queueName)
-				// this.loggerContext.setContext(this.context.getSpanServer())
-				// await callback(input)
-				// channel.ack(msg)
-				// this.context.endSpanWithoutContext()
 			} catch (e: any) {
 				channel.nack(msg, false, false)
 			}

@@ -4,7 +4,7 @@ import { IUnitOfWorkApplication } from "./IUnitOfWorkApplication";
 import { IUserRepository } from "./IUserRepository";
 import { ICreateUser, UserCreatedDto } from "./ICreateUser";
 import { CreateUserDto } from "./dto/CreateUserDto";
-import { InternalServerErrorException } from "../infra/exceptions/InternalServerErrorException";
+import { InternalServerErrorException } from "./exceptions/InternalServerErrorException";
 import { IGenerateCodeConfirmation } from "./IGenerateCodeConfirmationGateway";
 
 export class CreateUser implements ICreateUser {

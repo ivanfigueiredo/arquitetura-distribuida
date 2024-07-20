@@ -2,7 +2,7 @@ import { HttpClient } from "./HttpClient";
 import express, { Request, Response } from 'express';
 import { ISpan, ILoggerContext } from 'expense-core';
 import { DomainException } from "../domain/exception/DomainException";
-import { InternalServerErrorException } from "./exceptions/InternalServerErrorException";
+import { InternalServerErrorException } from "../application/exceptions/InternalServerErrorException";
 
 export class ExpressAdapter implements HttpClient {
     connect: any;
