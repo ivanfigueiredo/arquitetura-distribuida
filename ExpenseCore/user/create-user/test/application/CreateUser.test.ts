@@ -4,6 +4,7 @@ import { IGenerateCodeConfirmation } from "../../src/application/IGenerateCodeCo
 import { IUserRepository } from "../../src/application/IUserRepository"
 import { CreateUser } from "../../src/application/CreateUser"
 import { IUnitOfWorkApplication } from "../../src/application/IUnitOfWorkApplication"
+import { User } from "../../src/domain/User"
 
 describe('CreateUser', () => {
     let usecase: ICreateUser
@@ -36,5 +37,22 @@ describe('CreateUser', () => {
 
     test('Deve ser definido', () => {
         expect(usecase).toBeDefined()
+    })
+
+    test('Deve criar um usuário com sucesso', async () => {
+        const spyOnCreate = jest.spyOn(User, 'create')
+        const spyOnGenerateCode = jest.spyOn(generateCodeConfirmation, 'generateCode')
+        const spyOnStartTransaction = jest.spyOn(unitOfWork, 'startTransaction')
+        const spyOnCommit = jest.spyOn(unitOfWork, 'commit')
+        const spyOnSave = jest.spyOn(repository, 'save')
+
+        const result = await usecase.execute({ email: 'mail@test.com', password: 'S&nh@123', userType: 'Individual' })
+
+        expect(result).toHaveProperty('userId')
+        expect(spyOnCreate).toHaveBeenCalled()
+        expect(spyOnGenerateCode).toHaveBeenCalled()
+        expect(spyOnStartTransaction).toHaveBeenCalled()
+        expect(spyOnCommit).toHaveBeenCalled()
+        expect(spyOnSave).toHaveBeenCalled()
     })
 })
