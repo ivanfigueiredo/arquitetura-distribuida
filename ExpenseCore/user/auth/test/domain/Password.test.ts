@@ -26,4 +26,9 @@ describe("Password", () => {
             )
         )
     })
+
+    test('Deve validar uma senha com sucesso', () => {
+        const password = Password.create('S&nh@123')
+        expect(password.passwordMatches('S&nh@123')).toBeTruthy()
+    })
 })
