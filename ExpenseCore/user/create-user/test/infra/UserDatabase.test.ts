@@ -53,4 +53,9 @@ describe('UserDatabase', () => {
         expect(output).toBeInstanceOf(User)
         expect(output).not.toBeNull()
     })
+
+    test('Deve retornar nulo caso não seja encontrado nenhum usuário com o e-maail informado', async () => {
+        const output = await userDatabase.findUserByEmail('test@mail.com')
+        expect(output).toBeNull()
+    })
 })
