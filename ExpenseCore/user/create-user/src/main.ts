@@ -3,7 +3,6 @@ import { CreateUser } from './application/CreateUser';
 import { UserDatabase } from './infra/UserDatabase';
 import { ExpressAdapter } from './infra/ExpressAdapter';
 import { MainCoontroller } from './infra/MainController';
-import { UnitOfWork } from './infra/UnitOfWork';
 import { PostgresAdapter } from './infra/PostgresAdapter';
 import { DatabaseConnection } from './infra/DatabaseConnection';
 import { GenerateCodeConfirmationGateway } from './infra/GenerateCodeConfirmationGateway';
@@ -14,7 +13,6 @@ import { ICreateUser } from './application/ICreateUser';
 export class MainLayer {
     private expressAdapter?: ExpressAdapter
     private databaseConnection: DatabaseConnection
-    private unitOfWork?: UnitOfWork
     private userDatabase?: UserDatabase
     private generateCodeConfirmationGateway?: GenerateCodeConfirmationGateway
     public createUser?: ICreateUser
@@ -31,12 +29,10 @@ export class MainLayer {
     async init(): Promise<void> {
         await this.databaseConnection!.init()
         this.expressAdapter = new ExpressAdapter(this.span!, this.loggerContext!)
-        this.unitOfWork = new UnitOfWork(this.databaseConnection)
-        this.userDatabase = new UserDatabase(this.unitOfWork, this.logger!)
+        this.userDatabase = new UserDatabase(this.databaseConnection!, this.logger!)
         this.generateCodeConfirmationGateway = new GenerateCodeConfirmationGateway(this.span!)
         this.createUser = new CreateUser(
             this.userDatabase,
-            this.unitOfWork,
             this.generateCodeConfirmationGateway!,
             this.logger!
         )
