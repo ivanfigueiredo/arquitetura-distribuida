@@ -4,6 +4,7 @@ import { IUserRepository } from "../../src/application/IUserRepository"
 import { UserDatabase } from "../../src/infra/UserDatabase"
 import { User } from "../../src/domain/User"
 import { InternalServerErrorException } from "../../src/application/exceptions/InternalServerErrorException"
+import { UserEntity } from "../../src/infra/entities/UserEntity"
 
 describe('UserDatabase', () => {
     let unitOfWork: IUnitOfWorkInfra
@@ -43,5 +44,13 @@ describe('UserDatabase', () => {
             new InternalServerErrorException("Internal server error. If the error persists, contact support", 500)
         )
         expect(spyOnLogger).toHaveBeenCalledTimes(1)
+    })
+
+    test('Deve retornar um usuário pelo email', async () => {
+        const user = User.create('test@mail.com', 'S&nh@123', 'Individual')
+        jest.spyOn(unitOfWork, 'findOne').mockResolvedValue(UserEntity.from(user))
+        const output = await userDatabase.findUserByEmail('test@mail.com')
+        expect(output).toBeInstanceOf(User)
+        expect(output).not.toBeNull()
     })
 })
