@@ -100,4 +100,26 @@ describe('UserInfo', () => {
             }
         )
     })
+
+    test('Deve retornar um erro caso o usuário não exista com o userId informado', async () => {
+        jest.spyOn(userRepository, 'findUserByUserId').mockResolvedValue(undefined)
+        const spyOnFindUserByEmail = jest.spyOn(userRepository, 'findUserByEmail')
+        const spyOnFindUserByUserId = jest.spyOn(userRepository, 'findUserByUserId')
+        const spyOnPublish = jest.spyOn(queue, 'publish')
+
+        await usecase.execute({ email: undefined, userId: randomUUID() })
+
+        expect(spyOnFindUserByEmail).not.toHaveBeenCalledTimes(1)
+        expect(spyOnFindUserByUserId).toHaveBeenCalledTimes(1)
+        expect(spyOnPublish).toHaveBeenCalledWith(
+            'user.events',
+            'user.info.error',
+            {
+                error: {
+                    message: 'User not found',
+                    statusCode: 404
+                }
+            }
+        )
+    })
 })
