@@ -17,4 +17,13 @@ describe("Password", () => {
             )
         )
     })
+
+    test('Deve criar uma senha com sucesso', () => {
+        expect(() => Password.create('S&nh@123')).not.toThrow(
+            new DomainException(
+                "A senha não é válida. Ela deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um dígito e um caractere especial.",
+                422
+            )
+        )
+    })
 })
