@@ -41,6 +41,7 @@ describe('UserInfo', () => {
 
         await usecase.execute({ email: 'test@mail.com' })
 
+        expect(spyOnFindUserByEmail).toHaveBeenCalledTimes(1)
         expect(spyOnPublish).toHaveBeenCalledWith(
             'client.events',
             'client.registration.step-2',
@@ -49,6 +50,26 @@ describe('UserInfo', () => {
                 email: userMock.email,
                 password: userMock.password.value,
                 userType: userMock.userType
+            }
+        )
+    })
+
+    test('Deve retornar um erro caso o usuário não exista com o email informado', async () => {
+        jest.spyOn(userRepository, 'findUserByEmail').mockResolvedValue(undefined)
+        const spyOnFindUserByEmail = jest.spyOn(userRepository, 'findUserByEmail')
+        const spyOnPublish = jest.spyOn(queue, 'publish')
+
+        await usecase.execute({ email: 'test@mail.com' })
+
+        expect(spyOnFindUserByEmail).toHaveBeenCalledTimes(1)
+        expect(spyOnPublish).toHaveBeenCalledWith(
+            'user.events',
+            'user.info.error',
+            {
+                error: {
+                    message: 'User not found',
+                    statusCode: 404
+                }
             }
         )
     })
