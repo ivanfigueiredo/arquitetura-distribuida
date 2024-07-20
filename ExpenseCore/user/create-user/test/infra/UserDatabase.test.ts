@@ -74,4 +74,12 @@ describe('UserDatabase', () => {
         expect(output).not.toBeNull()
         expect(spyOnFindOne).toHaveBeenCalled()
     })
+
+    test('Deve retornar nulo caso não seja encontrado nenhum usuário com o userId informado', async () => {
+        const userId = randomUUID()
+        const spyOnFindOne = jest.spyOn(unitOfWork, 'findOne')
+        const output = await userDatabase.findUserByUserId(userId)
+        expect(output).toBeNull()
+        expect(spyOnFindOne).toHaveBeenCalled()
+    })
 })
