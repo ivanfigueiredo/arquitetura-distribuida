@@ -37,4 +37,15 @@ describe('Auth', () => {
         expect(output).toHaveProperty('token')
         expect(output.token).toBeTruthy()
     })
+
+    test('Deve lançar uma exceção caso a senha seja inválida', async () => {
+        const userId = randomUUID()
+        const user = User.restore(userId, 'test@mail.com', 'S&nh@123', 'Individual', true)
+        jest.spyOn(user.password, 'passwordMatches').mockReturnValue(false)
+        jest.spyOn(userRepository, 'findUserByEmail').mockResolvedValue(user)
+        const promise = usecase.execute({ email: 'test@mail.com', password: 'S&nh@123' })
+        await expect(promise).rejects.toThrow(
+            new UnauthorizedException('Email or password invalid', 401)
+        )
+    })
 })
