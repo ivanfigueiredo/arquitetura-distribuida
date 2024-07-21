@@ -16,9 +16,7 @@ export class Password {
     }
 
     public passwordMatches(password: string): boolean {
-        const passwordHash = createHash("sha1").update(password).digest("hex");
-        const result = this.value === passwordHash;
-        return result
+        return this.value === createHash("sha1").update(password).digest("hex");
     }
 
     public static create(value: string): Password {
