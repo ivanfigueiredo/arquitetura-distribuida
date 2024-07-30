@@ -30,7 +30,12 @@ export class ExcludeClient implements IExcludeClient {
                 }
                 await this.unitOfWork.commit()
                 this.logger.info('ExcludeClient - Publicando evento de erro na criacao do cliente')
-                await this.queue.publish('client.events', 'client.registration.error', { error: { message: dto.error.message } })
+                await this.queue.publish('client.events', 'client.registration.error', { 
+                    error: { 
+                        message: dto.error.message,
+                        status: dto.error.status
+                    } 
+                })
                 return
             } else {
                 this.logger.info('ExcludeClient - Estado não recuperado')
@@ -41,7 +46,12 @@ export class ExcludeClient implements IExcludeClient {
                 this.logger.info('ExcludeClient - Fazendo rollback')
                 await this.unitOfWork.rollBack()
             }
-            await this.queue.publish('client.events', 'client.registration.error', { error: { message: dto.error.message } })
+            await this.queue.publish('client.events', 'client.registration.error', { 
+                error: { 
+                    message: dto.error.message,
+                    status: dto.error.status
+                } 
+            })
         }
     }
 }
