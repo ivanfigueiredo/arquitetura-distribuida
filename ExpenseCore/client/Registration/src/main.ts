@@ -39,7 +39,7 @@ export class MainLayer {
     async init(): Promise<void> {
         await this.databaseConnection.init();
         this.expressAdapter = new ExpressAdapter(this.span!, this.loggerContext!);
-        this.unitOfWork = new UnitOfWork(this.databaseConnection);
+        this.unitOfWork = new UnitOfWork(this.databaseConnection, this.logger!);
         this.clientDatabase = new ClientDatabase(this.unitOfWork, this.logger!);
         this.clientRegistration = new ClientRegistration(
             this.logger!,
