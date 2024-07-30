@@ -1,2 +1,0 @@
-INSERT INTO public.user_type (user_type_id,"type") VALUES ('897c9f22-f0fd-4a60-a52c-e82292e64e92','INDIVIDUAL');
-INSERT INTO public.user_type (user_type_id,"type") VALUES ('d6d1e528-afb1-4c33-9ef8-895c99e78acb','BUSINESS');
