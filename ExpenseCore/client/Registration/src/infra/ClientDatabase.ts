@@ -1,10 +1,10 @@
-import { ILogger } from "expense-core";
+import { ILogger } from "expense-core"
 import { IClientRepository } from "../application/IClientRepository"
-import { Client } from "../domain/Client";
-import { IUnitOfWorkInfra } from './IUnitOfWorkInfra';
-import { ContactEntity, ProfileEntity } from "./entities";
-import { ClientEntity } from "./entities/ClientEntity";
-import { InternalServerErrorException } from "./exceptions/InternalServerErrorException";
+import { Client } from "../domain/Client"
+import { IUnitOfWorkInfra } from './IUnitOfWorkInfra'
+import { ContactEntity, ProfileEntity } from "./entities"
+import { ClientEntity } from "./entities/ClientEntity"
+import { InternalServerErrorException } from "./exceptions/InternalServerErrorException"
 
 export class ClientDatabase implements IClientRepository {
     constructor(
