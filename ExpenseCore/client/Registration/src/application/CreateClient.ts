@@ -40,7 +40,7 @@ export class CreateClient implements ICreateClient {
             await this.repository.save(client)
             await this.unitOfWork.commit()
             this.logger.info('CreateClient - Salvando Estado da criacao do Cliente')
-            await this.stateManager.set<ClientCreatedDto>('ClientCreated', { clientId: client.id }, 400000)
+            await this.stateManager.set<ClientCreatedDto>('ClientCreated', { clientId: client.id })
             this.logger.info(`CreateClient - Client Salvo com sucesso`)
             this.logger.info(`CreateClient - Chamando microsservico para cadastro do documento`)
             await this.queue.publish(
@@ -54,7 +54,17 @@ export class CreateClient implements ICreateClient {
             )
         } catch (error: any) {
             this.logger.error(`CreateClient - Error: ${error.message}`)
-            await this.queue.publish('client.events', 'client.registration.error', { error: { message: error.message } })
+            if (error instanceof InternalServerErrorException) {
+                this.logger.error('CreateClient - Fazendo rollback')
+                await this.unitOfWork.rollBack()
+            }
+            await this.queue.publish('client.events', 'client.registration.error', { 
+                error: { 
+                    message: error.message,
+                    statusCode: error.status,
+                    timestamp: new Date().toISOString()
+                } 
+            })
         }
     }
 }

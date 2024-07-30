@@ -44,7 +44,10 @@ export class IncludeDocument implements IIncludeDocument {
                 'client.registration.step-3',
                 {
                     document: undefined,
-                    error: { message: error.message }
+                    error: { 
+                        message: error.message,
+                        status: error.status
+                    }
                 }
             )
         }

@@ -47,7 +47,10 @@ export class IncludeAddress implements IIncludeAddress {
                 'client.registration.step-4',
                 {
                     address: undefined,
-                    error: { message: error.message }
+                    error: { 
+                        message: error.message,
+                        status: error.status
+                    }
                 }
             )
         }

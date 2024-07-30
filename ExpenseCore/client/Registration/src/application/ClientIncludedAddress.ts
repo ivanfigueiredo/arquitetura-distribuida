@@ -28,18 +28,38 @@ export class ClientIncludedAddress implements IClientIncludedAddress {
                     }
                 }
                 this.logger.info('ClientIncludedAddress - Cliente criado com sucesso. Publicando evento de sucesso')
-                await this.queue.publish('client.events', 'client.registration.created', eventDto)
+                await this.queue.publish(
+                    'client.events',
+                    'client.registration.created',
+                    {
+                        eventName: 'CLIENT_REGISTRATION',
+                        timestamp: new Date().toISOString(),
+                        data: eventDto,
+                        error: undefined
+                    }
+                )
             }
             if (dto.error) {
                 this.logger.info('ClientIncludedAddress - Chamadno servico para exclusao do documento')
                 await this.queue.publish('client.events', 'client.exclude-document', {})
                 this.logger.info('ClientIncludedAddress - Chamando servico para exclusao do cliente')
-                await this.queue.publish('client.events', 'client.registration.step-5', { error: { message: dto.error.message } })
+                await this.queue.publish('client.events', 'client.registration.step-5', { 
+                    error: { 
+                        message: dto.error.message,
+                        status: dto.error.status 
+                    } 
+                })
             }
             this.logger.info('ClientIncludedAddress - Estado nao recuperado')
         } catch (error: any) {
             this.logger.error(`ClientIncludedAddress - Error: ${error.message}`)
-            await this.queue.publish('client.events', 'client.registration.error', { error: { message: error.message } })
+            await this.queue.publish('client.events', 'client.registration.error', { 
+                error: { 
+                    message: error.message,
+                    status: error.status,
+                    timestamp: new Date().toISOString()
+                } 
+            })
         }
     }
 }

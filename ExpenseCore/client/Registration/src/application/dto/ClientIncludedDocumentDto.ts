@@ -7,6 +7,7 @@ export class ClientIncludedDocumentDto {
         },
         readonly error?: {
             message: string
+            status: number
         }
     ) { }
 }

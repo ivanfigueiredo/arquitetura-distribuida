@@ -32,7 +32,7 @@ export class MainLayer {
     async init(): Promise<void> {
         await this.databaseConnection.init();
         this.expressAdapter = new ExpressAdapter(this.span!, this.loggerContext!);
-        this.userDatabase = new UserDatabase(this.databaseConnection);
+        this.userDatabase = new UserDatabase(this.databaseConnection, this.logger!);
         this.codeDatabase = new CodeDatabase(this.databaseConnection, this.logger!)
         this.auth = new Auth(this.userDatabase, this.logger!);
         this.authGateway = new AuthGateway(this.rabbitMQAdapter!, this.span!, this.logger!);

@@ -10,6 +10,7 @@ export class ClientIncludedAddressDto {
         },
         readonly error?: {
             message: string
+            status: number
         }
     ) { }
 }
