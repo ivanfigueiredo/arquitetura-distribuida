@@ -1,0 +1,2 @@
+VHOST: /
+QUEUE: client.exclude-document.queue
