@@ -7,19 +7,23 @@ import QueueController from './infra/QueueController';
 import { IClientCreated } from './application/IClientCreated';
 import { IClientCreatedError } from './application/IClientCreatedError';
 import { ClientCreatedError } from './application/ClientCreatedError';
+import { IAuthenticateGateway } from './application/IAuthenticateGateway';
+import { AuthenticateGateway } from './infra/AuthenticateGateway';
 
 export class MainLayer {
     public span?: SpanAdapter
     public rabbitMQAdapter?: RabbitMQAdapter
     public clientCreated?: IClientCreated
     public clientCreatedError?: IClientCreatedError
+    public auhenticate?: IAuthenticateGateway
     public logger?: ILogger
     public loggerContext?: ILoggerContext
     public stateManager?: IStateManeger
 
     async init(): Promise<void> {
         const pubsubAdapter = new PubSubAdapter()
-        const apolloServer = new ApolloServerAdapter(pubsubAdapter)
+        this.auhenticate = new AuthenticateGateway()
+        const apolloServer = new ApolloServerAdapter(pubsubAdapter, this.auhenticate!)
         this.clientCreated = new ClientCreated(pubsubAdapter)
         this.clientCreatedError = new ClientCreatedError(pubsubAdapter)
         new QueueController(
