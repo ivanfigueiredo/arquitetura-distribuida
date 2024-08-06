@@ -9,7 +9,7 @@ export class ClientCreatedError implements IClientCreatedError {
         this.pubsub.publish('PAYMENT', {
             eventName: 'CLIENT_REGISTRATION',
             timestamp: dto.error.timestamp,
-            data: undefined,
+            data: dto.data,
             error: {
                 message: dto.error.message,
                 statusCode: dto.error.statusCode
