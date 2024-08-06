@@ -11,11 +11,13 @@ export class ClientIncludedAddress implements IClientIncludedAddress {
     ) { }
 
     async execute(dto: ClientIncludedAddressDto): Promise<void> {
+        let userId = '';
         try {
             this.logger.info(`ClientIncludedAddress - Iniciando Step 4 para criacao do cliente`)
             this.logger.info(`ClientIncludedAddress - Recuperando Estado do evento de sucesso da criacao do cliente`)
             const clientCreatedEvent = await this.stateManager.get<CreatedClientEventDto>('ClientEventCreated')
             if (clientCreatedEvent && dto.address) {
+                userId = clientCreatedEvent.userId
                 const eventDto = {
                     ...clientCreatedEvent,
                     address: {
@@ -39,7 +41,8 @@ export class ClientIncludedAddress implements IClientIncludedAddress {
                     }
                 )
             }
-            if (dto.error) {
+            if (dto.error && clientCreatedEvent) {
+                userId = clientCreatedEvent.userId
                 this.logger.info('ClientIncludedAddress - Chamadno servico para exclusao do documento')
                 await this.queue.publish('client.events', 'client.exclude-document', {})
                 this.logger.info('ClientIncludedAddress - Chamando servico para exclusao do cliente')
@@ -47,7 +50,7 @@ export class ClientIncludedAddress implements IClientIncludedAddress {
                     error: { 
                         message: dto.error.message,
                         status: dto.error.status 
-                    } 
+                    }
                 })
             }
             this.logger.info('ClientIncludedAddress - Estado nao recuperado')
@@ -58,7 +61,10 @@ export class ClientIncludedAddress implements IClientIncludedAddress {
                     message: error.message,
                     status: error.status,
                     timestamp: new Date().toISOString()
-                } 
+                },
+                data: {
+                    userId
+                }
             })
         }
     }

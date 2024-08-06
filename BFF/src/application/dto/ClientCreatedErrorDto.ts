@@ -4,4 +4,7 @@ export interface ClientCreatedErrorDto {
         statusCode: number 
         timestamp: string
     }
+    data: {
+        userId: string
+    }
 }

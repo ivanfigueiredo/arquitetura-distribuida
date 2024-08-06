@@ -22,7 +22,8 @@ export class ClientIncludedDocument implements IClientIncludedDocument {
             this.logger.info(`ClientIncludedDocument - Iniciando Step 3 para criacao do cliente`)
             this.logger.info(`ClientIncludedDocument - Recuperando Estado da execucao CreateClient`)
             const clientCreated = await this.stateManager.get<ClientCreatedDto>('ClientCreated')
-            if (dto.error) {
+            const createClientDto = await this.stateManager.get<ClientRegistrationDto>('createClient')
+            if (dto.error && createClientDto) {
                 if (clientCreated) {
                     await this.unitOfWork.startTransaction();
                     this.logger.info(`ClientIncludedDocument - Recuperando cliente`)
@@ -35,11 +36,22 @@ export class ClientIncludedDocument implements IClientIncludedDocument {
                 } else {
                     this.logger.info('ClientIncludedDocument - Estado nao recuperado')
                 }
-                await this.queue.publish('client.events', 'client.registration.error', { error: { message: dto.error.message } })
+                await this.queue.publish(
+                    'client.events', 
+                    'client.registration.error', 
+                    { 
+                        error: { 
+                            message: dto.error.message,
+                            statusCode: dto.error.status,
+                            timestamp: new Date().toISOString()
+                        },
+                        data: {
+                            userId: createClientDto.userId
+                        }
+                    }
+                )
                 return
-            }
-            this.logger.info(`ClientIncludedDocument - Recuperando Estado da execucao CreateClient`)
-            const createClientDto = await this.stateManager.get<ClientRegistrationDto>('createClient')
+            }            
             if (createClientDto && clientCreated && dto.document) {
                 const clientCreatedEvent = new CreatedClientEventDto(
                     clientCreated.clientId,

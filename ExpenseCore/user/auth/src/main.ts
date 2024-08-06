@@ -11,6 +11,8 @@ import { IAuthGateway } from './application/IAuthGateway';
 import { AuthGateway } from './infra/AuthGateway';
 import { GenerateEmailConfirmationCode } from './application/GenerateEmailConfirmationCode';
 import { CodeDatabase } from './infra/CodeDatabase';
+import { IValidationToken } from './application/IValidationToken';
+import { ValidationToken } from './application/ValidationToken';
 
 export class MainLayer {
     private expressAdapter?: ExpressAdapter;
@@ -20,6 +22,7 @@ export class MainLayer {
     private auth?: IAuth;
     private generateEmailConfirmationCode?: IGenerateEmailConfirmationCode;
     private authGateway?: IAuthGateway;
+    private validationToken?: IValidationToken;
     public span?: SpanAdapter;
     public rabbitMQAdapter?: RabbitMQAdapter;
     public logger?: ILogger;
@@ -35,9 +38,10 @@ export class MainLayer {
         this.userDatabase = new UserDatabase(this.databaseConnection, this.logger!);
         this.codeDatabase = new CodeDatabase(this.databaseConnection, this.logger!)
         this.auth = new Auth(this.userDatabase, this.logger!);
+        this.validationToken = new ValidationToken()
         this.authGateway = new AuthGateway(this.rabbitMQAdapter!, this.span!, this.logger!);
         this.generateEmailConfirmationCode = new GenerateEmailConfirmationCode(this.codeDatabase, this.authGateway, this.logger!);
-        new MainController(this.expressAdapter, this.auth!, this.generateEmailConfirmationCode!);
+        new MainController(this.expressAdapter, this.auth!, this.generateEmailConfirmationCode!, this.validationToken!);
         this.expressAdapter!.listen(6000, () => { console.log("Rodando na porta 6000") });
     }
 
