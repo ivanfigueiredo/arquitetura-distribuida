@@ -85,8 +85,6 @@ export class ClientIncludedDocument implements IClientIncludedDocument {
                         country: createClientDto.address.country
                     }
                 )
-            } else {
-                this.logger.info('ClientIncludedDocument - Estado nao recuperado')
             }
         } catch (error: any) {
             this.logger.error(`ClientIncludedDocument - Error: ${error.message}`)
