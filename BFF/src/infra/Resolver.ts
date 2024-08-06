@@ -9,10 +9,11 @@ export class Resolver implements IResolvers {
     constructor(pubSub: IPubSub) {
         this.Subscription = {
             events: {
-                resolve: (payload: any, args: any, pubsub: any, info: any) => {
-                    const output = JSON.parse(payload);
-                    console.log('=====================>>>>>>> ', output)
-                    return output;
+                resolve: (payload: any, args: any, ctx: {userId: string}, info: any) => {
+                    const output = JSON.parse(payload)
+                    if (output.data.userId === ctx.userId) {
+                        return output
+                    }
                 },
                 subscribe: () => pubSub.subscribe('PAYMENT'),
             }
