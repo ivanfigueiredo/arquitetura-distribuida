@@ -8,7 +8,6 @@ export class ValidationToken implements IValidationToken {
             const output = JWT.validate(dto.token)
             return output.userId
         } catch (error: any) {
-            console.log('==============>>>>> ERROR', error)
             throw new UnauthorizedException('Invalid token', 401)
         }
     }

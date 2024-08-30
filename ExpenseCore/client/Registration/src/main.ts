@@ -1,4 +1,4 @@
-import { ExpenseCoreMain, ILogger, ILoggerContext, IStateManeger, RabbitMQAdapter, SpanAdapter } from 'expense-core';
+import { ExpenseCoreMain, IIdempotency, ILogger, ILoggerContext, IStateManeger, RabbitMQAdapter, SpanAdapter } from 'expense-core';
 import { ClientRegistration } from './application/ClientRegistration';
 import { ClientDatabase } from './infra/ClientDatabase';
 import { ExpressAdapter } from './infra/ExpressAdapter';
@@ -31,6 +31,7 @@ export class MainLayer {
     public logger?: ILogger
     public loggerContext?: ILoggerContext
     public stateManager?: IStateManeger
+    public idempotency?: IIdempotency
 
     constructor() {
         this.databaseConnection = new PostgresAdapter();
@@ -51,19 +52,22 @@ export class MainLayer {
             this.unitOfWork!,
             this.stateManager!,
             this.logger!,
-            this.rabbitMQAdapter!
+            this.rabbitMQAdapter!,
+            this.idempotency!
         )
         this.clientIncludecAddress = new ClientIncludedAddress(
             this.stateManager!,
             this.rabbitMQAdapter!,
-            this.logger!
+            this.logger!,
+            this.idempotency!
         )
         this.clientIncludedDocument = new ClientIncludedDocument(
             this.unitOfWork!,
             this.stateManager!,
             this.clientDatabase!,
             this.rabbitMQAdapter!,
-            this.logger!
+            this.logger!,
+            this.idempotency!
         )
         this.excludeClient = new ExcludeClient(
             this.clientDatabase!,

@@ -1,5 +1,7 @@
 export class InternalServerErrorException extends Error {
-    public constructor(readonly message: string, readonly status: number) {
+    readonly status: number = 500
+
+    public constructor(readonly message: string) {
         super(message);
     }
 }
