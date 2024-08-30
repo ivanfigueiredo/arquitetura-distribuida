@@ -1,4 +1,4 @@
-import { ILogger, IStateManeger, Queue } from "expense-core";
+import { IIdempotency, ILogger, IStateManeger, Queue } from "expense-core";
 import { ClientIncludedDocumentDto } from "./dto/ClientIncludedDocumentDto";
 import { IClientIncludedDocument } from "./IClientIncludedDocument";
 import { ClientCreatedDto } from "./dto/ClientCreatedDto";
@@ -14,12 +14,28 @@ export class ClientIncludedDocument implements IClientIncludedDocument {
         private readonly stateManager: IStateManeger,
         private readonly clientRepository: IClientRepository,
         private readonly queue: Queue,
-        private readonly logger: ILogger
+        private readonly logger: ILogger,
+        private readonly idempotencyManager: IIdempotency
     ) { }
 
     async execute(dto: ClientIncludedDocumentDto): Promise<void> {
         try {
             this.logger.info(`ClientIncludedDocument - Iniciando Step 3 para criacao do cliente`)
+            this.logger.info(`ClientIncludedDocument - Validando Idempotencia`)
+            await this.idempotencyManager.checkIdempotency(dto)
+            const payload = await this.idempotencyManager.retrieveProcessedResult<EventDto>()
+            if (payload) {
+                this.logger.info('ClientIncludedDocument - Evento já processado')
+                await this.publish({
+                    clientId: payload.clientId,
+                    city: payload.city,
+                    street: payload.street,
+                    postalCode: payload.postalCode,
+                    state: payload.state,
+                    country: payload.country
+                })
+                return
+            }
             this.logger.info(`ClientIncludedDocument - Recuperando Estado da execucao CreateClient`)
             const clientCreated = await this.stateManager.get<ClientCreatedDto>('ClientCreated')
             const createClientDto = await this.stateManager.get<ClientRegistrationDto>('createClient')
@@ -73,19 +89,21 @@ export class ClientIncludedDocument implements IClientIncludedDocument {
                 this.logger.info('ClientIncludedDocument - Salvando Estado do Evento de sucesso do cliente')
                 await this.stateManager.set<CreatedClientEventDto>('ClientEventCreated', clientCreatedEvent)
                 this.logger.info('ClientIncludedDocument - Chamando microsservico para cadastro do endereco')
-                await this.queue.publish(
-                    'client.events',
-                    'client.include-address',
-                    {
-                        clientId: clientCreated.clientId,
-                        city: createClientDto.address.city,
-                        street: createClientDto.address.street,
-                        postalCode: createClientDto.address.postalCode,
-                        state: createClientDto.address.state,
-                        country: createClientDto.address.country
-                    }
-                )
+                const payload: EventDto = {
+                    clientId: clientCreated.clientId,
+                    city: createClientDto.address.city,
+                    street: createClientDto.address.street,
+                    postalCode: createClientDto.address.postalCode,
+                    state: createClientDto.address.state,
+                    country: createClientDto.address.country
+                }
+                this.logger.info('ClientIncludedDocument - Salvando estado do evento processado')
+                await this.idempotencyManager.saveIdempotency<ClientIncludedDocumentDto, EventDto>(dto, payload)
+                await this.publish(payload)
+                this.logger.info('ClientIncludedDocument - Atualizando status processamento do evento')
+                await this.idempotencyManager.updateIdempotencyStatus()
             }
+            this.logger.info('ClientIncludedDocument - Estado não recuperado')
         } catch (error: any) {
             this.logger.error(`ClientIncludedDocument - Error: ${error.message}`)
             if (error instanceof InternalServerErrorException) {
@@ -94,4 +112,28 @@ export class ClientIncludedDocument implements IClientIncludedDocument {
             }
         }
     }
+
+    private async publish(payload: EventDto): Promise<void> {
+        await this.queue.publish(
+            'client.events',
+            'client.include-address',
+            {
+                clientId: payload.clientId,
+                city: payload.city,
+                street: payload.street,
+                postalCode: payload.postalCode,
+                state: payload.state,
+                country: payload.country
+            }
+        )
+    }
+}
+
+type EventDto = {
+    clientId: string,
+    city: string,
+    street: string,
+    postalCode: string,
+    state: string,
+    country: string
 }
