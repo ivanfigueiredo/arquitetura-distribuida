@@ -1,4 +1,4 @@
-import { ExpenseCoreMain, ILogger, ILoggerContext, IStateManeger, RabbitMQAdapter, SpanAdapter } from 'expense-core';
+import { ExpenseCoreMain, IIdempotency, ILogger, ILoggerContext, IStateManeger, RabbitMQAdapter, SpanAdapter } from 'expense-core';
 import { AddressDatabase } from './infra/AddressDatabase';
 import { ExpressAdapter } from './infra/ExpressAdapter';
 import { PostgresAdapter } from './infra/PostgresAdapter';
@@ -17,6 +17,7 @@ export class MainLayer {
     public logger?: ILogger
     public loggerContext?: ILoggerContext
     public stateManager?: IStateManeger
+    public idempotency?: IIdempotency
 
     constructor() {
         this.databaseConnection = new PostgresAdapter();
@@ -29,7 +30,8 @@ export class MainLayer {
         this.includeAddress = new IncludeAddress(
             this.addressDatabase!,
             this.logger!,
-            this.rabbitMQAdapter!
+            this.rabbitMQAdapter!,
+            this.idempotency!
         )
         new QueueController(this.rabbitMQAdapter!, this.logger!, this.includeAddress!)
         this.expressAdapter!.listen(9003, () => { console.log("Rodando na porta 9003") })
