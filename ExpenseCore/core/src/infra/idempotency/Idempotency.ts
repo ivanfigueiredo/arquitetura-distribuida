@@ -43,12 +43,12 @@ export class Idempotency implements IIdempotency {
         }
     }
 
-    private isCompletedTransaction(idempotencyType: IdempotencyType<any>): boolean {
-        return idempotencyType.status === IdempotencyStatus.COMPLETED
-    }
-
     private isConcurrentTransaction(idempotencyType: IdempotencyType<any>): boolean {
         return idempotencyType.status == IdempotencyStatus.IN_PROGRESS
+    }
+
+    private isCompletedTransaction(idempotencyType: IdempotencyType<any>): boolean {
+        return idempotencyType.status === IdempotencyStatus.COMPLETED
     }
 
     public async retrieveProcessedResult<D>(): Promise<D | null> {
