@@ -27,7 +27,6 @@ export class Idempotency implements IIdempotency {
 
     private generateHash(data: any): string {
         const hash = createHash('sha256').update(JSON.stringify(data)).digest('hex')
-        this.setHash(hash)
         return hash
     }
     
