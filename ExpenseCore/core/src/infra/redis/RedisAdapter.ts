@@ -5,7 +5,9 @@ export class RedisAdapter implements IConnection {
     private client: RedisClientType;
 
     constructor() {
-        this.client = createClient({ url: 'redis://redis:6379' })
+        this.client = createClient({            
+            url: 'redis://redis:6379'
+         })
     }
 
     public async connection(): Promise<void> {
